@@ -1,0 +1,816 @@
+/* ==== mhn_portfolio — style.css (v16) =======================================
+   - Light/Dark theme via CSS variables
+   - Fixed header with theme-aware background
+   - Animated gradient name in hero
+   - Project & Featured cards: equal height, tags pinned to bottom
+   - Centered footer (one line on all sizes)
+   - Certificate modal scrolls inside, page locked behind
+   - Certificate cards: single clean card (thumb not clickable)
+   - Light-mode inputs use mint background (no white)
+   - Mobile header: theme toggle visible at top-right (to the left of hamburger)
+   ========================================================================== */
+
+/* ---------------- THEME VARIABLES ---------------- */
+:root{
+  /* DARK (default) */
+  --bg: #0b0c10;
+  --bg-grad: radial-gradient(1100px 600px at 75% -20%, #111827 0%, var(--bg) 60%);
+  --card:#111317;
+  --text:#e5e7eb;
+  --muted:#9aa1aa;
+  --brand:#4f46e5;
+  --brand-ghost:#2c2f3a;
+  --border:#1f2430;
+  --tag:#1f2937;
+  --container: 1200px;
+  --header-h: 64px;
+
+  /* header + surfaces that depend on theme */
+  --header-bg: rgba(11,12,16,.85);
+  --hover-surface: #141826;
+  --input-bg: #0e1016;
+}
+
+/* ===== VIBRANT LIGHT THEME — Sky • Lemon • Mint ===== */
+html[data-theme="light"]{
+  /* Section hues */
+  --sky:    #90d7ff;
+  --lemon:  #fff47a;
+  --field:  #95e3a6;
+
+  /* Type & UI */
+  --text:   #0f172a;
+  --muted:  #475569;
+
+  /* Brand */
+  --brand:       #4f46e5;
+  --brand-ghost: #e9e8ff;
+
+  /* Cards & borders */
+  --card:        #ffffffd9;
+  --card-surface:linear-gradient(180deg,#fff,#fafafa);
+  --card-border: #e7e7ec;
+  --border:      #e8e9ef;
+
+  /* Tags & subtle fills */
+  --tag:         rgba(79,70,229,.10);
+  --hover-surface: rgba(16,24,40,.04);
+
+  /* Glassy header */
+  --header-bg: rgba(255,255,255,.78);
+
+  /* Inputs default (we override to mint below) */
+  --input-bg: #ffffff;
+}
+
+/* =========================================================
+   Light theme — form fields match background + new buttons
+   ========================================================= */
+html[data-theme="light"]{
+  /* Mint palette for your chosen light mode */
+  --mint: #bfeec8;
+  --mint-ink: #0e2a22;
+  --mint-ink-muted: #2a5a4f;
+
+  --bg: var(--mint);
+  --card: color-mix(in srgb, var(--mint) 92%, #000 8%);
+  --border: color-mix(in srgb, var(--mint) 75%, #000 25%);
+  --tag: color-mix(in srgb, var(--mint) 70%, #000 30%);
+  --text: var(--mint-ink);
+  --muted: var(--mint-ink-muted);
+
+  --brand: #2fc487;      /* top of gradient */
+  --brand-deep: #1f9c72; /* bottom of gradient */
+}
+
+/* page + header stay clean mint */
+html[data-theme="light"] body{
+  background: var(--bg) !important;
+}
+html[data-theme="light"] .site-header{
+  background: var(--bg) !important;
+  border-bottom-color: var(--border);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* cards/blocks (coherent on mint) */
+html[data-theme="light"] .card,
+html[data-theme="light"] .project-card,
+html[data-theme="light"] .cert-card,
+html[data-theme="light"] .skill-card,
+html[data-theme="light"] .featured-card,
+html[data-theme="light"] .highlight,
+html[data-theme="light"] .info,
+html[data-theme="light"] .form{
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--text);
+  box-shadow: none;
+}
+
+/* -------- Forms (Contact/Hire) -------- */
+/* Inputs match the background (no white) */
+html[data-theme="light"] .form input,
+html[data-theme="light"] .form textarea{
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.05);
+}
+html[data-theme="light"] .form input::placeholder,
+html[data-theme="light"] .form textarea::placeholder{
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+html[data-theme="light"] .form input:focus,
+html[data-theme="light"] .form textarea:focus{
+  outline: none;
+  border-color: color-mix(in srgb, var(--brand) 60%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+/* -------- Buttons (Send + Contact CTA) -------- */
+html[data-theme="light"] .btn{
+  background: linear-gradient(180deg, var(--brand), var(--brand-deep));
+  border-color: var(--brand-deep);
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(47,196,135,.25);
+}
+html[data-theme="light"] .btn:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+  box-shadow: 0 12px 24px rgba(47,196,135,.32);
+}
+html[data-theme="light"] .btn:active{ transform: translateY(0) }
+
+html[data-theme="light"] .btn.ghost{
+  background: transparent;
+  color: var(--text) !important;
+  border-color: var(--brand-deep);
+}
+html[data-theme="light"] .btn.ghost:hover{
+  background: color-mix(in srgb, var(--brand) 10%, var(--bg));
+}
+
+/* Make sure the nav "Contact" CTA uses the same primary style */
+html[data-theme="light"] .site-header .nav .btn{ color:#fff !important; }
+
+/* Tag chips readable on mint */
+html[data-theme="light"] .tag{
+  background: var(--tag);
+  color: var(--text);
+}
+
+
+/* ---------------- BASICS ---------------- */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  background: var(--bg-grad);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header-h);
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+body.no-scroll { overflow: hidden; }
+
+img{ max-width:100%; height:auto; display:block; }
+.container{ width: min(var(--container), 92%); margin: 0 auto; }
+main.container{ flex: 1 0 auto; }
+
+.lead{ color: var(--muted); max-width: 65ch; }
+.info{ color: var(--muted); background: var(--card); border:1px solid var(--border);
+       padding: 1rem; border-radius: .8rem; }
+
+/* ---------------- TYPOGRAPHY ---------------- */
+h1{ font-size: clamp(1.9rem, 1.1rem + 2.4vw, 3rem); line-height: 1.14; margin: 0 0 .7rem; }
+h2{ font-size: clamp(1.4rem, 1.08rem + .9vw, 2rem); margin: 0 0 .5rem; }
+h3{ font-size: clamp(1.05rem, 1rem + .4vw, 1.25rem); margin: .1rem 0 .35rem; }
+
+/* ---------------- HEADER (fixed) ---------------- */
+.site-header{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: var(--header-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+}
+.header-grid{
+  display: grid; grid-template-columns: 1fr auto auto;
+  align-items: center; gap: 1rem; padding: .9rem 0;
+}
+.brand{ font-weight: 800; text-decoration: none; color: var(--text); letter-spacing: .2px; }
+.brand span{ color: var(--brand); }
+
+/* Desktop nav links */
+.nav a:not(.btn){ color: var(--muted); margin-left: 1rem; text-decoration: none; }
+.nav a:not(.btn):hover{ color: var(--text); }
+
+/* Active nav underline */
+.nav a.active{ color:#fff; position: relative; }
+.nav a.active::after{
+  content:""; position:absolute; left:0; right:0; bottom:-8px;
+  height:2px; border-radius:2px;
+  background: linear-gradient(90deg, var(--brand), #a78bfa);
+}
+
+/* Contact CTA stays bright */
+.site-header .nav .btn{ color:#fff; margin-left: 1rem; }
+
+/* Theme toggle button */
+.icon-btn{
+  position: relative; z-index: 1100;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; margin-left:.6rem;
+  border-radius:999px; border:1px solid var(--border);
+  background: var(--card); color: var(--text);
+  cursor:pointer;
+  transition: transform .15s ease, background .2s ease, box-shadow .2s ease, color .2s ease;
+}
+.icon-btn:hover{ transform: translateY(-2px); background: var(--hover-surface); box-shadow:0 6px 16px rgba(0,0,0,.25); }
+.icon-btn svg{ width:18px; height:18px; fill: currentColor; }
+/* show moon by default; swap when light */
+.icon-btn .moon{ display:block; }
+.icon-btn .sun{ display:none; }
+html[data-theme="light"] .icon-btn .moon{ display:none; }
+html[data-theme="light"] .icon-btn .sun{ display:block; }
+
+.hamburger{
+  display:none; font-size:1.2rem; background:var(--brand-ghost); color:var(--text);
+  border:1px solid var(--border); padding:.4rem .6rem; border-radius:.5rem;
+}
+
+/* ---------------- BUTTONS ---------------- */
+.btn, .btn:link, .btn:visited{ text-decoration:none !important; outline:none; }
+.btn{
+  background: linear-gradient(180deg, var(--brand), #4338ca);
+  color:#fff; padding:.6rem .95rem;
+  border-radius:.75rem; border:1px solid #4338ca;
+  display:inline-block; font-weight:600;
+  box-shadow:0 6px 16px rgba(79,70,229,.25);
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, filter .16s ease;
+}
+.btn:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(79,70,229,.32); filter:brightness(1.05); }
+.btn:active{ transform:translateY(0); }
+.btn.ghost{ background:transparent; border:1px solid var(--brand); color:var(--text); box-shadow:none; }
+.btn.ghost:hover{ background:rgba(79,70,229,.12); }
+
+/* ---------------- HERO ---------------- */
+.hero{ padding: clamp(1.4rem, 1rem + 2vw, 3rem) 0 2rem; }
+.hero-grid{
+  display:grid; align-items:center; gap: clamp(1rem, 1.2vw, 2rem);
+  grid-template-columns: 1.2fr .8fr; /* text / avatar */
+}
+.hero-copy{ max-width: 60ch; }
+
+/* Animated gradient name */
+.hero-title{ position: relative; line-height: 1.15; }
+.brand-name.hero-name{
+  background-image: linear-gradient(
+    90deg,
+    #8b5cf6 0%,
+    #6366f1 20%,
+    #22d3ee 40%,
+    #8b5cf6 60%,
+    #6366f1 80%,
+    #22d3ee 100%
+  ) !important;
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  animation: heroGradientShift 9s ease-in-out infinite;
+  position: relative;
+}
+.brand-name.hero-name::before{
+  content:""; position:absolute; left:0; right:0; bottom:-.22rem;
+  height:3px; border-radius:999px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,.95), rgba(167,139,250,.95), transparent);
+  opacity:.75; transform-origin:left center; animation: heroUnderline 3.8s ease-in-out infinite;
+}
+.brand-name.hero-name::after{
+  content:""; position:absolute; left:-.3rem; right:-.3rem; bottom:-.35rem;
+  height:55%; z-index:-1;
+  background: radial-gradient(60% 80% at 50% 100%, rgba(79,70,229,.35), transparent 70%);
+  filter: blur(12px); animation: heroGlow 5.2s ease-in-out infinite alternate;
+}
+.brand-name.hero-name:hover{ animation-duration: 4.5s; }
+
+@keyframes heroGradientShift{
+  0%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+  100%{ background-position: 0% 50%; }
+}
+@keyframes heroUnderline{
+  0%,100%{ transform: scaleX(.18); opacity:.35; }
+  50%{ transform: scaleX(1); opacity:.95; }
+}
+@keyframes heroGlow{
+  from{ transform: translateY(2px);  opacity:.55; }
+  to  { transform: translateY(-2px); opacity:.9; }
+}
+
+/* Avatar */
+.avatar-wrap{ justify-self:end; align-self:center; }
+.avatar-wrap img{
+  width: clamp(140px,16vw,210px); height: clamp(140px,16vw,210px);
+  border-radius:50%; border:6px solid var(--border); background:#0e1016; object-fit: cover;
+  box-shadow:0 10px 24px rgba(0,0,0,.35);
+}
+
+@media (min-width:1400px){
+  .hero-grid{ grid-template-columns: 1.15fr .85fr; }
+}
+@media (max-width:1100px){
+  .hero-grid{ grid-template-columns:1.05fr .95fr; }
+  .avatar-wrap img{ width:clamp(130px,20vw,200px); height:clamp(130px,20vw,200px); }
+}
+@media (max-width:900px){
+  .hero-grid{ grid-template-columns:1fr; }
+  .avatar-wrap{ justify-self:center; margin-top:1rem; }
+  .avatar-wrap img{ width:clamp(120px,32vw,180px); height:clamp(120px,32vw,180px); }
+}
+
+/* ---------------- STATS (3/2/1) ---------------- */
+.highlights{ margin-top: clamp(1rem, 1.6vw, 1.6rem); }
+.highlight-grid{ display:grid; gap: 1rem; }
+@media (min-width:1280px){ .highlight-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width:700px) and (max-width:1279px){ .highlight-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:699px){ .highlight-grid{ grid-template-columns: 1fr; } }
+.highlight{ background: var(--card); border:1px solid var(--border); border-radius:1rem; padding:1.1rem; text-align:center; }
+.h-num{ font-size: clamp(1.8rem, 1.3rem + 2vw, 2.4rem); font-weight:800; letter-spacing:.5px; }
+.h-label{ color: var(--muted); margin-top:.25rem; }
+
+/* ---------------- SKILLS (3/2/1) ---------------- */
+.skills{ margin-top: 2rem; }
+.skills-grid{ display:grid; gap:1rem; }
+@media (min-width:1280px){ .skills-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width:700px) and (max-width:1279px){ .skills-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:699px){ .skills-grid{ grid-template-columns: 1fr; } }
+.skill-card{ background: var(--card); border:1px solid var(--border); border-radius:1rem; padding:1rem; }
+.skill{ display:grid; grid-template-columns:120px 1fr 52px; align-items:center; gap:.8rem; margin:.6rem 0; }
+.skill span{ color: var(--text); }
+.skill .pct{ color: var(--muted); text-align:right; }
+.bar{ position:relative; height:10px; background:#0e1016; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+.bar-fill{ height:100%; width:0; border-radius:inherit; animation: grow 1.1s ease forwards; }
+.bar-fill.cxx{ background:#fb7185; } .bar-fill.python{ background:#60a5fa; }
+.bar-fill.dart{ background:#34d399; } .bar-fill.fastapi{ background:#22c55e; }
+.bar-fill.html{ background:#f59e0b; } .bar-fill.css{ background:#a78bfa; }
+.bar-fill.postgres{ background:#38bdf8; }
+@keyframes grow{ to{ width: var(--val); } }
+
+/* ---------------- FEATURED (3/2/1) ---------------- */
+.featured{ margin-top:2rem; }
+.featured-head{ display:flex; align-items:baseline; justify-content:space-between; }
+.link-inline{ color:#93c5fd; text-decoration:none; }
+.link-inline:hover{ text-decoration:underline; }
+.featured-row{ display:grid; gap:1rem; }
+@media (min-width:1280px){ .featured-row{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width:700px) and (max-width:1279px){ .featured-row{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:699px){ .featured-row{ grid-template-columns:1fr; } }
+
+.featured-card{
+  display:flex; flex-direction:column;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:1rem; padding:1rem; text-decoration:none; color:var(--text);
+  transition: transform .2s ease, box-shadow .2s ease;
+  min-height: 180px;
+}
+.featured-card h3{ margin:0 0 .35rem 0; }
+.featured-card p{ color:var(--muted); margin:0 0 .8rem 0; }
+.featured-card .tags{ margin-top:auto; }
+.featured-card:hover{ transform:translateY(-6px); box-shadow:0 12px 28px rgba(0,0,0,.35); }
+
+/* Shared tags */
+.tags{ display:flex; flex-wrap:wrap; gap:.4rem; margin:.6rem 0 .8rem; }
+.tag{ background: var(--tag); color:#334155; padding:.2rem .5rem; border-radius:.5rem; font-size:.85rem; }
+html[data-theme="dark"] .tag{ color:#c5d0df; }
+
+/* ---------------- PROJECTS (3/2/1) ---------------- */
+.project-section{ margin-top: 1.6rem; }
+.section-title{ margin:.2rem 0 1rem; font-size:1.35rem; font-weight:800; }
+
+.project-grid{ display:grid; gap:1rem; align-items:stretch; }
+@media (min-width:1280px){ .project-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width:700px) and (max-width:1279px){ .project-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:699px){ .project-grid{ grid-template-columns: 1fr; } }
+
+.project-card{
+  display:flex; flex-direction:column;
+  background: var(--card); border:1px solid var(--border);
+  padding:1rem; border-radius:1rem; text-decoration:none; color:var(--text);
+  transition: transform .22s ease, box-shadow .22s ease;
+  min-height: 180px;
+}
+.project-card h3{ margin:0 0 .35rem 0; }
+.project-card p{ color:var(--muted); margin:0 0 .8rem 0; }
+.project-card .tags{ margin-top:auto; }
+.project-card:hover{ transform:translateY(-6px); box-shadow:0 12px 28px rgba(0,0,0,.35); }
+
+/* ---------------- GENERIC CARDS ---------------- */
+.cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:2rem 0 0; }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:1rem; padding:1rem; }
+
+/* ---------------- FORMS & ALERTS ---------------- */
+.form{ display:grid; gap:.8rem; background:var(--card); border:1px solid var(--border);
+       padding:1rem; border-radius:1rem; max-width:720px; }
+.form label{ display:grid; gap:.35rem; color:var(--muted); }
+.form input, .form textarea{
+  width:100%; padding:.7rem .8rem; border-radius:.6rem;
+  border:1px solid var(--border); background: var(--input-bg); color:var(--text);
+}
+.alert{ padding:.8rem 1rem; border-radius:.8rem; margin-bottom:1rem; }
+.alert.success{ background:#0a3d2b; color:#c0f2df; border:1px solid #0f5c41; }
+
+/* ---------------- FOOTER ---------------- */
+.site-footer{ border-top:1px solid var(--border); margin-top:3rem; padding:2rem 0; color:var(--muted); }
+.footer-grid{
+  display:flex; align-items:center; justify-content:center; gap:1rem;
+  text-align:center; flex-wrap: wrap;
+}
+.footer-grid .copyright{ white-space:nowrap; }
+.socials{ display:flex; gap:.5rem; }
+.socials a{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:999px;
+  background:var(--card); border:1px solid var(--border);
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.socials a:hover{ transform:translateY(-3px); background: var(--hover-surface); box-shadow:0 6px 16px rgba(0,0,0,.25); }
+.socials svg{ width:18px; height:18px; fill:#c5d0df; }
+html[data-theme="light"] .socials svg{ fill:#475569; }
+
+/* ---------------- ABOUT ---------------- */
+.about-hero{
+  display:grid; grid-template-columns:1.2fr .8fr;
+  gap:2rem; align-items:center; padding-top:1rem;
+}
+.about-photo{ justify-self:end; }
+.about-photo img{
+  width: clamp(220px, 24vw, 320px); max-width:100%;
+  aspect-ratio: 3/4; object-fit:cover; border-radius:1rem;
+  border:6px solid var(--border); background:#0e1016;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+}
+.info-cards{ display:grid; gap:.8rem; }
+@media (min-width:1280px){ .info-cards{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width:1279px){ .info-cards{ grid-template-columns: 1fr; } }
+.info{ background:var(--card); border:1px solid var(--border); border-radius:.8rem; padding:.8rem; }
+.info-label{ color:var(--muted); font-size:.9rem; }
+.info-value a{ color:#93c5fd; text-decoration:none; }
+.info-value a:hover{ text-decoration:underline; }
+.timeline{ list-style:none; padding:0; margin:.4rem 0 1.2rem; border-left:2px solid var(--border); }
+.timeline li{ margin:0 0 .9rem 1rem; padding-left:.8rem; position:relative; }
+.timeline li::before{
+  content:""; width:10px; height:10px; border-radius:50%; background:var(--brand);
+  position:absolute; left:-6px; top:.4rem;
+}
+.t-head{ display:flex; justify-content:space-between; gap:.5rem; }
+.t-title{ font-weight:700; }
+.t-when{ color:var(--muted); }
+.t-sub{ color:var(--muted); margin-bottom:.2rem; }
+.t-body{ color:var(--muted); margin:0; }
+
+/* ============================
+   Certificates – refined card
+   ============================ */
+
+/* Responsive grid */
+.cert-grid{
+  display:grid;
+  gap:1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  margin-top: 1rem;
+}
+
+/* Card shell */
+.cert-card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  display: flex;
+  flex-direction: column;
+}
+.cert-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+  border-color: color-mix(in srgb, var(--border), #fff 14%);
+}
+
+/* Top area: image sits "inside" — not another card */
+.cert-thumb{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:.75rem .9rem .5rem;
+  background:transparent;
+  border-bottom:1px solid var(--border);
+}
+.cert-thumb[href]{ pointer-events: none !important; } /* guard */
+
+.cert-thumb img{
+  max-width:100%;
+  height:180px;
+  width:auto;
+  object-fit:contain;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.cert-card:hover .cert-thumb img{ transform:none; box-shadow:none; }
+
+/* Body and meta */
+.cert-body{ padding: .85rem 1rem 1rem; }
+.cert-body h3{ margin: 0 0 .25rem; line-height: 1.25; }
+.cert-meta{ color: var(--muted); margin-top: .1rem; }
+
+/* Actions on one row, balanced */
+.cert-actions{
+  margin-top: .8rem;
+  display: flex;
+  gap: .6rem;
+  justify-content: space-between;
+  align-items: center;
+}
+.cert-actions .btn{ min-width: 108px; }
+
+/* Light-mode polish */
+html[data-theme="light"] .cert-card{ box-shadow: 0 6px 16px rgba(0,0,0,.10); }
+html[data-theme="light"] .cert-thumb img{
+  background: color-mix(in srgb, var(--bg) 85%, #000 15%);
+}
+
+/* ---------------- MODAL ---------------- */
+.modal-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none; align-items: center; justify-content: center;
+  z-index: 50; padding: 1rem;
+  overflow-y: auto; /* scroll modal, not page */
+}
+.modal-backdrop.open{ display: flex; }
+
+.modal{
+  background: var(--card); border:1px solid var(--border); border-radius:1rem;
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  padding: 1.2rem; width: min(720px, 92vw);
+  max-height: 92vh; overflow: auto; text-align: center;
+}
+.modal h3{ margin:.2rem 0 .4rem; }
+.modal-actions{ display:flex; justify-content:center; gap:.8rem; margin-top:.8rem; }
+
+/* Image modal — auto-size, fully scrollable, centered */
+.modal.modal-image{
+  width: auto;
+  max-width: calc(100vw - 40px);
+  padding: .5rem;
+  background: var(--card);
+  border-radius: 1rem;
+}
+.modal-image img{
+  max-width: 100%; height: auto;
+  max-height: calc(92vh - 76px);
+  object-fit: contain; border-radius:.6rem;
+  border:1px solid var(--border); background:#0e1016;
+}
+
+/* ---------------- MOBILE NAV ----------------
+   Show theme toggle at top-right (left of hamburger) even on small screens.
+   Works whether #themeToggle is a sibling of .nav or lives inside .nav.
+------------------------------------------------ */
+@media (max-width:640px){
+  /* Header layout becomes simple flex bar */
+  .header-grid{
+    display:flex;
+    align-items:center;
+  }
+  .brand{ margin-right:auto; }
+
+  /* Hamburger always visible on mobile */
+  .hamburger{
+    display:inline-flex;
+    order:3;
+    margin-left:.5rem;
+  }
+
+  /* If the toggle is OUTSIDE .nav, just ensure it shows */
+  #themeToggle{
+    display:inline-flex;
+    order:2;
+    margin-left:.5rem;
+  }
+
+  /* If the toggle lives INSIDE .nav:
+     - keep .nav visible as a tiny row that only shows the toggle
+     - when .nav opens, show links as a dropdown, but keep the toggle
+       pinned in the header next to the hamburger                     */
+  .nav{
+    order:2;
+    display:flex;                 /* keep the container rendered */
+    align-items:center;
+    gap:.4rem;
+  }
+  .nav > *{ display:none; }       /* hide everything by default */
+  .nav > #themeToggle{            /* show the toggle only */
+    display:inline-flex;
+    margin:0;
+  }
+
+  /* Dropdown panel */
+  .nav.open{
+    position:absolute;
+    top: calc(var(--header-h) + 8px);
+    right: 4%;
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:.6rem;
+    border-radius:.8rem;
+    z-index: 1001;
+    display:block;                /* panel layout */
+  }
+  .nav.open > *{ display:block; margin:.4rem 0; }   /* show links/items */
+  .nav.open > #themeToggle{                          /* keep toggle in header */
+    position: fixed;
+    top: 10px;
+    right: calc(4% + 44px);       /* just to the left of hamburger */
+    display:inline-flex;
+    margin:0;
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:0;
+  }
+
+  /* Skills grid tweak */
+  .skill{ grid-template-columns:100px 1fr 48px; }
+}
+
+/* ---------------- HELPERS ---------------- */
+.link{ color:#93c5fd; text-decoration:none; }
+.link:hover{ text-decoration:underline; }
+
+/* =================================================================
+   Light-mode colorful overrides
+   ================================================================= */
+
+/* Make “card-like” components pastel & glossy in light mode */
+html[data-theme="light"] .featured-card,
+html[data-theme="light"] .project-card,
+html[data-theme="light"] .skill-card,
+html[data-theme="light"] .highlight,
+html[data-theme="light"] .form,
+html[data-theme="light"] .cert-card,
+html[data-theme="light"] .info,
+html[data-theme="light"] .card,
+html[data-theme="light"] .socials a{
+  background: var(--card-surface);
+  border-color: var(--card-border);
+}
+
+/* Colorful, soft-glow hover in light mode */
+html[data-theme="light"] .project-card:hover,
+html[data-theme="light"] .featured-card:hover,
+html[data-theme="light"] .skill-card:hover,
+html[data-theme="light"] .cert-card:hover,
+html[data-theme="light"] .card:hover{
+  box-shadow:
+    0 16px 36px rgba(99, 102, 241, .20),
+    0 10px 24px rgba(6, 182, 212, .12),
+    0  2px  8px rgba(244, 63, 94, .06);
+  transform: translateY(-6px);
+}
+
+/* Buttons: vivid gradient in light mode */
+html[data-theme="light"] .btn{
+  background: linear-gradient(180deg, #7c3aed 0%, #6366f1 60%, #22d3ee 100%);
+  border-color: #7c3aed;
+  color:#fff;
+  box-shadow:
+    0 8px 22px rgba(124, 58, 237, .25),
+    0 2px 10px rgba(34, 211, 238, .14);
+}
+html[data-theme="light"] .btn:hover{ filter: brightness(1.04); }
+html[data-theme="light"] .btn.ghost{
+  border-color:#7c3aed;
+  background: rgba(124,58,237,.06);
+}
+
+/* Header: subtle light gradient + clearer active state */
+html[data-theme="light"] .site-header{ background: var(--header-bg); }
+html[data-theme="light"] .nav a:not(.btn){ color:#64748b; }
+html[data-theme="light"] .nav a:not(.btn):hover{ color:#0b1220; }
+html[data-theme="light"] .nav a.active{ color:#0b1220; }
+
+/* Theme toggle matches light palette */
+html[data-theme="light"] .icon-btn{
+  background:#fff;
+  border-color: var(--card-border);
+  color:#334155;
+}
+html[data-theme="light"] .icon-btn:hover{
+  background:#f1f5ff;
+  box-shadow:0 6px 16px rgba(99,102,241,.18);
+}
+
+/* Tags: playful pastel chips (varied by position) */
+html[data-theme="light"] .tag{
+  border:1px solid var(--card-border);
+  color:#0f172a;
+  background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
+}
+html[data-theme="light"] .tags .tag:nth-child(3n+1){
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-color:#dbeafe;
+}
+html[data-theme="light"] .tags .tag:nth-child(3n+2){
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  border-color:#ffe4e6;
+}
+html[data-theme="light"] .tags .tag:nth-child(3n){
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-color:#d1fae5;
+}
+
+/* Light mode: links not blue */
+html[data-theme="light"] .link,
+html[data-theme="light"] .link-inline,
+html[data-theme="light"] .info-value a{
+  color: var(--text) !important;
+}
+
+/* (IMPORTANT) Inputs stay mint – override any white forms from above */
+html[data-theme="light"] .form input,
+html[data-theme="light"] .form textarea{
+  background: var(--bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--text) !important;
+}
+
+/* Footer icons on light mode */
+html[data-theme="light"] .socials svg{ fill:#475569; }
+html[data-theme="light"] .socials a:hover{
+  background:#f1f5ff;
+  box-shadow:0 6px 16px rgba(99,102,241,.18);
+}
+
+/* Hero: gentle colorful mist */
+html[data-theme="light"] .hero{
+  background:
+    radial-gradient(700px 240px at 20% 10%, rgba(124,58,237,.10), transparent 60%),
+    radial-gradient(700px 260px at 70% 0%, rgba(34,211,238,.10), transparent 62%);
+  border-radius: 1rem;
+}
+
+/* =========================================================
+   LIGHT MODE TWEAKS — Skills + Contact form
+   ========================================================= */
+
+/* Contact form: remove shadows entirely */
+html[data-theme="light"] .form input,
+html[data-theme="light"] .form select,
+html[data-theme="light"] .form textarea{ box-shadow: none !important; }
+html[data-theme="light"] .form input:focus,
+html[data-theme="light"] .form select:focus,
+html[data-theme="light"] .form textarea:focus{ box-shadow: none !important; }
+
+/* Compact pill button bottom-left with arrow */
+html[data-theme="light"] .form .btn{
+  padding: .65rem 1rem !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  font-size: .95rem !important;
+  justify-self: start !important;
+  align-self: end !important;
+}
+html[data-theme="light"] .form .btn::after{
+  content: "›";
+  margin-left: .55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Skills: kill hover glow in LIGHT mode */
+html[data-theme="light"] .skills .skill-card,
+html[data-theme="light"] .skills .skill-card:hover{
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  transition: none !important;
+}
+
+/* Skills: unfilled track matches page background in LIGHT mode */
+html[data-theme="light"] .skills .bar{
+  background: var(--bg) !important;
+  border-color: color-mix(in srgb, var(--bg) 70%, #000 30%) !important;
+}

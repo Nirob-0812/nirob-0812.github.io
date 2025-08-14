@@ -1,33 +1,64 @@
-<h1>Contact</h1>
-
-<form class="form" method="post" action="/contact.html">
-  <label>
-    <span>Name</span>
-    <input type="text" name="name" required />
-  </label>
-  <label>
-    <span>Email</span>
-    <input type="email" name="email" required />
-  </label>
-  <label>
-    <span>Subject</span>
-    <input type="text" name="subject" required />
-  </label>
-  <label>
-    <span>Message</span>
-    <textarea name="message" rows="5" required></textarea>
-  </label>
-  <button class="btn" type="submit">Send</button>
-</form>
-
-<!-- Centered success modal (closed by default; add "open" class to show) -->
-<div id="successModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="successTitle">
-  <div class="modal">
-    <h3 id="successTitle">Thanks! Your message was sent ✅</h3>
-    <p class="lead">I’ll get back to you shortly.</p>
-    <div class="modal-actions">
-      <a class="btn" href="/index.html">Go Home</a>
-      <a class="btn ghost" href="/contact.html">Close</a>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Contact — Mehedi Hasan Nirob</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <link rel="icon" href="/static/img/mehedi-portrait.jpg"/>
+  <script src="/static/js/main.js" defer></script>
+</head>
+<body data-api="off">
+  <header class="site-header">
+    <div class="container header-grid">
+      <a href="/index.html" class="brand">Mehedi <span>Hasan Nirob</span></a>
+      <nav id="nav" class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/resume.html">Resume</a>
+        <a href="/certificates.html">Certificates</a>
+        <a class="btn" href="/contact.html">Contact</a>
+      </nav>
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun"  viewBox="0 0 24 24" width="18" height="18"><path d="M12 4V2m0 20v-2m8-8h2M2 12h2m12.95 6.95l1.41 1.41M5.64 5.64 4.22 4.22m12.73 0 1.41 1.41M5.64 18.36 4.22 19.78"/></svg>
+      </button>
+      <button class="hamburger" type="button" onclick="toggleNav()" aria-label="Menu">☰</button>
     </div>
-  </div>
-</div>
+  </header>
+
+  <main class="container">
+    <h1>Contact</h1>
+    <form class="form" action="https://formspree.io/f/xbldneoy" method="POST">
+      <label> Name
+        <input type="text" name="name" placeholder="Your name" required />
+      </label>
+
+      <label> Email
+        <input type="email" name="email" placeholder="you@example.com" required />
+      </label>
+
+      <label> Subject
+        <input type="text" name="subject" placeholder="What’s this about?" />
+      </label>
+
+      <label> Message
+        <textarea name="message" rows="7" placeholder="Tell me a bit about your project…"></textarea>
+      </label>
+
+      <button class="btn" type="submit">Send</button>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>
+      <div class="socials">
+        <a href="https://github.com/Nirob-0812" target="_blank" rel="noopener">GH</a>
+        <a href="mailto:mehedihasannirobcsediu@gmail.com">✉</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

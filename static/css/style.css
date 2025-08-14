@@ -235,10 +235,22 @@ h3{ font-size: clamp(1.05rem, 1rem + .4vw, 1.25rem); margin: .1rem 0 .35rem; }
   transition: transform .15s ease, background .2s ease, box-shadow .2s ease, color .2s ease;
 }
 .icon-btn:hover{ transform: translateY(-2px); background: var(--hover-surface); box-shadow:0 6px 16px rgba(0,0,0,.25); }
-.icon-btn svg{ width:18px; height:18px; fill: currentColor; }
+.icon-btn svg.icon-btn svg{ width:18px; height:18px; display:block; }
 /* show moon by default; swap when light */
-.icon-btn .moon{ display:block; }
-.icon-btn .sun{ display:none; }
+.icon-btn .moon{ fill: currentColor; stroke: none; }
+.icon-btn .sun *{
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Ensure good contrast in light mode */
+html[data-theme="light"] .icon-btn{
+  background:#fff;
+  color: var(--mint-ink);            /* your dark text color on mint */
+  border-color: var(--card-border);
+}
 html[data-theme="light"] .icon-btn .moon{ display:none; }
 html[data-theme="light"] .icon-btn .sun{ display:block; }
 

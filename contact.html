@@ -1,0 +1,33 @@
+<h1>Contact</h1>
+
+<form class="form" method="post" action="/contact.html">
+  <label>
+    <span>Name</span>
+    <input type="text" name="name" required />
+  </label>
+  <label>
+    <span>Email</span>
+    <input type="email" name="email" required />
+  </label>
+  <label>
+    <span>Subject</span>
+    <input type="text" name="subject" required />
+  </label>
+  <label>
+    <span>Message</span>
+    <textarea name="message" rows="5" required></textarea>
+  </label>
+  <button class="btn" type="submit">Send</button>
+</form>
+
+<!-- Centered success modal (closed by default; add "open" class to show) -->
+<div id="successModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+  <div class="modal">
+    <h3 id="successTitle">Thanks! Your message was sent ✅</h3>
+    <p class="lead">I’ll get back to you shortly.</p>
+    <div class="modal-actions">
+      <a class="btn" href="/index.html">Go Home</a>
+      <a class="btn ghost" href="/contact.html">Close</a>
+    </div>
+  </div>
+</div>

@@ -1,108 +1,117 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Resume — Mehedi Hasan Nirob</title>
-  <link rel="stylesheet" href="/static/css/style.css"/>
-  <link rel="icon" href="/static/img/mehedi-portrait.jpg"/>
-  <script src="/static/js/main.js" defer></script>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- set saved theme before paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
-<body data-api="off">
+<body>
+  <!-- Header / nav -->
   <header class="site-header">
     <div class="container header-grid">
-      <a href="/index.html" class="brand">Mehedi <span>Hasan Nirob</span></a>
-      <nav id="nav" class="nav">
-        <a href="/index.html">Home</a>
+      <a class="brand" href="/"><strong>Mehedi</strong> <span>Hasan Nirob</span></a>
+
+      <!-- theme toggle (left of hamburger on mobile) -->
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zM4.84 19.16l1.79 1.8 1.79-1.8-1.79-1.79-1.79 1.79zM20 13h3v-2h-3v2zm-1.76 6.16l1.79-1.8-1.79-1.79-1.79 1.79 1.79 1.8zM13 1h-2v3h2V1zm6.83 3.84l-1.79-1.79-1.79 1.79 1.79 1.79 1.79-1.79zM12 6a6 6 0 100 12 6 6 0 000-12z"/>
+        </svg>
+      </button>
+
+      <button class="hamburger" onclick="toggleNav()" aria-label="Open menu">☰</button>
+
+      <nav id="nav" class="nav" aria-label="Primary">
+        <a href="/">Home</a>
         <a href="/about.html">About</a>
         <a href="/projects.html">Projects</a>
-        <a href="/resume.html">Resume</a>
+        <a href="/resume.html" class="active">Resume</a>
         <a href="/certificates.html">Certificates</a>
         <a class="btn" href="/contact.html">Contact</a>
       </nav>
-      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
-        <svg class="moon" viewBox="0 0 24 24" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg class="sun"  viewBox="0 0 24 24" width="18" height="18"><path d="M12 4V2m0 20v-2m8-8h2M2 12h2m12.95 6.95l1.41 1.41M5.64 5.64 4.22 4.22m12.73 0 1.41 1.41M5.64 18.36 4.22 19.78"/></svg>
-      </button>
-      <button class="hamburger" type="button" onclick="toggleNav()" aria-label="Menu">☰</button>
     </div>
   </header>
 
   <main class="container">
     <h1>Resume</h1>
-    <p class="lead">Download my resume as a PDF or preview it online.</p>
 
-    <div class="cards">
-      <div class="card">
-        <h3>Download</h3>
-        <p>Click below to download the latest copy.</p>
-        <a class="btn" href="/static/files/Resume_Nirob.pdf" target="_blank" rel="noopener">Download PDF</a>
-      </div>
-
-      <div class="card">
-        <h3>Preview</h3>
-        <p>Opens in a new tab to preview in your browser.</p>
-        <a class="btn ghost" href="/static/files/Resume_Nirob.pdf" target="_blank" rel="noopener">Open Preview</a>
-      </div>
-
-      <div class="card">
-        <h3>Contact</h3>
-        <p>If you need a tailored version, feel free to reach out.</p>
-        <a class="btn" href="/contact.html">Contact Me</a>
-      </div>
+    <!-- PDF embed -->
+    <div class="card" style="padding:0; overflow:hidden;">
+      <iframe
+        src="/static/files/Resume_Nirob.pdf"
+        title="Resume - Mehedi Hasan Nirob"
+        width="100%"
+        height="880"
+        style="border:0; display:block;"
+      ></iframe>
     </div>
+
+    <!-- Fallback links -->
+    <p class="info" style="margin-top:.8rem;">
+      If the PDF doesn’t load, you can
+      <a class="link" href="/static/files/Resume_Nirob.pdf" target="_blank" rel="noopener">open it in a new tab</a>
+      or
+      <a class="link" href="/static/files/Resume_Nirob.pdf" download>download it</a>.
+    </p>
   </main>
 
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>
+  <!-- Footer (multi-icon) -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>
+      <nav class="socials" aria-label="Social links">
+        <a href="https://github.com/Nirob-0812" aria-label="GitHub" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M12 .296A12 12 0 0 0 8.21 23.7c.6.11.82-.26.82-.58 0-.29-.01-1.06-.02-2.08-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.5.12-3.12 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.65 1.62.24 2.82.12 3.12.77.84 1.23 1.9 1.23 3.22 0 4.62-2.8 5.64-5.48 5.94.43.37.81 1.1.81 2.23 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0 0 12 .296z"/>
+          </svg>
+        </a>
 
-    <nav class="socials" aria-label="Social links">
-      <!-- GitHub -->
-      <a href="https://github.com/Nirob-0812" aria-label="GitHub" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-          <path d="M12 .296A12 12 0 0 0 8.21 23.7c.6.11.82-.26.82-.58 0-.29-.01-1.06-.02-2.08-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.5.12-3.12 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.65 1.62.24 2.82.12 3.12.77.84 1.23 1.9 1.23 3.22 0 4.62-2.8 5.64-5.48 5.94.43.37.81 1.1.81 2.23 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0 0 12 .296z"/>
-        </svg>
-      </a>
+        <a href="https://facebook.com/nirob0812" aria-label="Facebook" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22 12a10 10 0 1 0-11.56 9.9v-7h-2.2V12h2.2V9.8c0-2.17 1.29-3.37 3.27-3.37.95 0 1.95.17 1.95.17v2.15h-1.1c-1.08 0-1.42.67-1.42 1.36V12h2.42l-.39 2.9h-2.03v7A10 10 0 0 0 22 12z"/>
+          </svg>
+        </a>
 
-      <!-- Facebook -->
-      <a href="https://facebook.com/nirob0812" aria-label="Facebook" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M22 12a10 10 0 1 0-11.56 9.9v-7h-2.2V12h2.2V9.8c0-2.17 1.29-3.37 3.27-3.37.95 0 1.95.17 1.95.17v2.15h-1.1c-1.08 0-1.42.67-1.42 1.36V12h2.42l-.39 2.9h-2.03v7A10 10 0 0 0 22 12z"/>
-        </svg>
-      </a>
+        <a href="mailto:mehedihasannirobcsediu@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM20 8l-8 5L4 8V6l8 5 8-5v2z"/>
+          </svg>
+        </a>
 
-      <!-- Email -->
-      <a href="mailto:mehedihasannirobcsediu@gmail.com" aria-label="Email">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM20 8l-8 5L4 8V6l8 5 8-5v2z"/>
-        </svg>
-      </a>
+        <a href="https://www.instagram.com/mehedihasannirob0812/" aria-label="Instagram" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2h10c2.76 0 5 2.24 5 5v10c0 2.76-2.24 5-5 5H7c-2.76 0-5-2.24-5-5V7c0-2.76 2.24-5 5-5zm5 5a5 5 0 100 10 5 5 0 000-10z"/>
+            <circle cx="18.5" cy="5.5" r="1.5"/>
+          </svg>
+        </a>
 
-      <!-- Instagram -->
-      <a href="https://www.instagram.com/mehedihasannirob0812/" aria-label="Instagram" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 2h10c2.76 0 5 2.24 5 5v10c0 2.76-2.24 5-5 5H7c-2.76 0-5-2.24-5-5V7c0-2.76 2.24-5 5-5zm5 5a5 5 0 100 10 5 5 0 000-10z"/>
-          <circle cx="18.5" cy="5.5" r="1.5"/>
-        </svg>
-      </a>
+        <a href="https://wa.me/8801736121659" aria-label="WhatsApp" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.52 3.48A11.77 11.77 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.08 1.5 5.82L0 24l6.37-1.67A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.19-1.24-6.19-3.48-8.52zM12 22a9.94 9.94 0 01-5.07-1.39l-.36-.21-3.78 1L4 17.7l-.24-.39A9.96 9.96 0 1122 12c0 5.52-4.48 10-10 10zm5.24-7.54c-.29-.15-1.71-.84-1.98-.94-.27-.1-.46-.14-.65.15-.2.29-.75.94-.92 1.13-.17.19-.34.22-.63.08-.29-.15-1.23-.45-2.34-1.43-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.59.14-.14.29-.34.43-.52.14-.18.19-.3.29-.5.1-.19.05-.37-.02-.52-.07-.15-.65-1.56-.89-2.14-.23-.56-.47-.48-.65-.49l-.56-.01c-.19 0-.5.07-.76.37-.26.29-1 1-1 2.44 0 1.44 1.02 2.83 1.16 3.02.14.19 2 3.06 4.85 4.29.68.29 1.21.46 1.62.59.68.22 1.3.19 1.79.12.55-.08 1.71-.7 1.95-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34z"/>
+          </svg>
+        </a>
 
-      <!-- WhatsApp -->
-      <a href="https://wa.me/8801736121659" aria-label="WhatsApp" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M20.52 3.48A11.77 11.77 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.08 1.5 5.82L0 24l6.37-1.67A11.95 11.95 0 0012 24c6.63 0 12-5.37 12-12 0-3.19-1.24-6.19-3.48-8.52zM12 22a9.94 9.94 0 01-5.07-1.39l-.36-.21-3.78 1L4 17.7l-.24-.39A9.96 9.96 0 1122 12c0 5.52-4.48 10-10 10zm5.24-7.54c-.29-.15-1.71-.84-1.98-.94-.27-.1-.46-.14-.65.15-.2.29-.75.94-.92 1.13-.17.19-.34.22-.63.08-.29-.15-1.23-.45-2.34-1.43-.86-.77-1.44-1.72-1.61-2.01-.17-.29-.02-.45.13-.59.14-.14.29-.34.43-.52.14-.18.19-.3.29-.5.1-.19.05-.37-.02-.52-.07-.15-.65-1.56-.89-2.14-.23-.56-.47-.48-.65-.49l-.56-.01c-.19 0-.5.07-.76.37-.26.29-1 1-1 2.44 0 1.44 1.02 2.83 1.16 3.02.14.19 2 3.06 4.85 4.29.68.29 1.21.46 1.62.59.68.22 1.3.19 1.79.12.55-.08 1.71-.7 1.95-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34z"/>
-        </svg>
-      </a>
+        <a href="https://x.com/mhnirob0812" aria-label="X (Twitter)" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16.98 2H20l-6.5 8.09L21 22h-6.2l-4.84-7.35L5 22H2l7.03-8.66L2 2h6.2l4.5 6.84L16.98 2z"/>
+          </svg>
+        </a>
+      </nav>
+    </div>
+  </footer>
 
-      <!-- X / Twitter -->
-      <a href="https://x.com/mhnirob0812" aria-label="X (Twitter)" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M16.98 2H20l-6.5 8.09L21 22h-6.2l-4.84-7.35L5 22H2l7.03-8.66L2 2h6.2l4.5 6.84L16.98 2z"/>
-        </svg>
-      </a>
-    </nav>
-  </div>
-</footer>
-
+  <script src="/static/js/main.js"></script>
 </body>
 </html>

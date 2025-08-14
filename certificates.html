@@ -1,0 +1,28 @@
+<section>
+  <h1>Certificates</h1>
+  <p class="lead">
+    Selected certificates and credits. Click <em>View</em> to preview, or <em>Verify</em> to open the official verification page.
+  </p>
+
+  <!-- Cards are injected here by main.js from /api/certificates -->
+  <div id="certGrid" class="cert-grid" data-bind="cert-grid">
+    <!-- Example static entries (optional) -->
+    <div class="cert-card">
+      <h3>FastAPI Masterclass</h3>
+      <p>Comprehensive backend development with FastAPI.</p>
+      <div class="cert-actions">
+        <a href="certificates/fastapi-masterclass.pdf" target="_blank" class="btn">View</a>
+        <a href="https://verify.example.com/fastapi" target="_blank" class="btn ghost">Verify</a>
+      </div>
+    </div>
+
+    <div class="cert-card">
+      <h3>PostgreSQL for Developers</h3>
+      <p>Advanced database design and optimization.</p>
+      <div class="cert-actions">
+        <a href="certificates/postgresql.pdf" target="_blank" class="btn">View</a>
+        <a href="https://verify.example.com/postgresql" target="_blank" class="btn ghost">Verify</a>
+      </div>
+    </div>
+  </div>
+</section>

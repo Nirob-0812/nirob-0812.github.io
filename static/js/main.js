@@ -1,5 +1,5 @@
 /* =========================================================
-   Small helpers
+   Small helpers / config
    ========================================================= */
 const API_BASE = (document.body.dataset.api && document.body.dataset.api !== 'off')
   ? document.body.dataset.api.replace(/\/+$/, '')
@@ -17,6 +17,7 @@ function toggleNav() {
   const nav = $id('nav');
   if (nav) nav.classList.toggle('open');
 }
+window.toggleNav = toggleNav;
 
 /* =========================================================
    Footer year
@@ -57,49 +58,48 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
 
 /* =========================================================
-   Skeleton helpers
+   Skeleton helpers (match Featured style)
    ========================================================= */
-function skeletonProjectCards(count = 6) {
-  let out = '';
-  for (let i = 0; i < count; i++) {
-    out += `
-      <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
-        <div class="skeleton skeleton-line w-60"></div>
-        <div class="skeleton skeleton-line w-90"></div>
-        <div class="tags">
-          <span class="tag skeleton-tag"></span>
-          <span class="tag skeleton-tag"></span>
-          <span class="tag skeleton-tag"></span>
-        </div>
-      </a>`;
-  }
-  return out;
+function skeletonCard() {
+  return `
+    <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
+      <div class="skeleton skeleton-line w-60"></div>
+      <div class="skeleton skeleton-line w-90"></div>
+      <div class="tags">
+        <span class="tag skeleton-tag"></span>
+        <span class="tag skeleton-tag"></span>
+        <span class="tag skeleton-tag"></span>
+      </div>
+    </a>`;
 }
-function skeletonCertCards(count = 6) {
-  let out = '';
-  for (let i = 0; i < count; i++) {
-    out += `
-      <article class="cert-card skeleton-card">
-        <div class="cert-thumb"><div class="skeleton skeleton-thumb"></div></div>
-        <div class="cert-body">
-          <div class="skeleton skeleton-line w-70"></div>
-          <div class="skeleton skeleton-line w-40"></div>
-        </div>
-      </article>`;
-  }
-  return out;
+function skeletonCountForViewport() {
+  const w = window.innerWidth || document.documentElement.clientWidth || 1024;
+  if (w < 480)  return 4;   // phones
+  if (w < 768)  return 6;   // small tablets
+  if (w < 1024) return 8;   // tablets
+  if (w < 1440) return 12;  // laptop
+  return 16;                // wide desktop
+}
+function renderSkeletonGridInto(container, count) {
+  container.innerHTML = `<div class="project-grid">${Array.from({length: count}).map(skeletonCard).join('')}</div>`;
 }
 
 /* =========================================================
-   CERTIFICATES — load from API if available
+   Certificates (API + skeleton)
    ========================================================= */
 async function renderCertificates() {
   const grid = $id('certGrid');
-  if (!grid) return;
+  if (!grid || !API_BASE) return; // keep static fallback on GH Pages
 
-  if (!API_BASE) return; // keep your static fallback
-
-  grid.innerHTML = skeletonCertCards(6);
+  // simple card skeletons
+  grid.innerHTML = Array.from({length: 6}).map(() => `
+    <article class="cert-card skeleton-card">
+      <div class="cert-thumb"><div class="skeleton skeleton-thumb"></div></div>
+      <div class="cert-body">
+        <div class="skeleton skeleton-line w-70"></div>
+        <div class="skeleton skeleton-line w-40"></div>
+      </div>
+    </article>`).join('');
 
   try {
     const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
@@ -133,7 +133,7 @@ async function renderCertificates() {
 }
 
 /* =========================================================
-   CERTIFICATE MODAL
+   Certificate Modal
    ========================================================= */
 (function setupCertModal() {
   const modal = $id('certModal');
@@ -173,7 +173,7 @@ async function renderCertificates() {
 })();
 
 /* =========================================================
-   PROJECTS page — grouped sections + skeleton
+   Projects page — skeleton like Featured (no headers while loading)
    ========================================================= */
 const CATEGORY_TITLES = {
   dl: 'Deep Learning / CV',
@@ -186,37 +186,41 @@ const CATEGORY_TITLES = {
   other: 'Other'
 };
 const CATEGORY_ORDER = ['dl', 'ml', 'web', 'app', 'algo', 'robotics', 'notebook', 'other'];
+function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
 
-function getTechs(p) {
-  return p.techs || p.tech || p.tags || p.stack || [];
-}
+let projectSkeletonResizeHandler = null;
 
 async function renderProjects() {
   const mount = $id('projectsApp');
   if (!mount) return;
 
-  if (!API_BASE) return; // leave any static fallback
+  if (!API_BASE) return; // keep static HTML fallback on GH Pages when no API
 
-  mount.innerHTML = skeletonProjectCards(9);
+  // 1) show a Featured-style grid skeleton (no section names)
+  const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
+  drawSkeleton();
+  // keep it responsive while still loading
+  projectSkeletonResizeHandler = () => drawSkeleton();
+  window.addEventListener('resize', projectSkeletonResizeHandler, { passive: true });
 
   try {
     const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const items = await res.json();
 
+    // stop updating skeleton
+    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    projectSkeletonResizeHandler = null;
+
     if (!Array.isArray(items) || !items.length) {
       mount.innerHTML = '<div class="info">No projects yet.</div>';
       return;
     }
 
-    // group by category
+    // 2) replace skeleton with real grouped sections
     const grouped = {};
-    for (const p of items) {
-      const key = p.category || 'other';
-      (grouped[key] ||= []).push(p);
-    }
+    for (const p of items) (grouped[p.category || 'other'] ||= []).push(p);
 
-    // sections by order
     let html = '';
     for (const key of CATEGORY_ORDER) {
       const list = grouped[key];
@@ -246,30 +250,31 @@ async function renderProjects() {
     mount.innerHTML = html || '<div class="info">No projects available.</div>';
   } catch (err) {
     console.error(err);
+    // stop updating skeleton on error too
+    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    projectSkeletonResizeHandler = null;
     mount.innerHTML = '<div class="info">Failed to load projects.</div>';
   }
 }
 
 /* =========================================================
-   HOME page — Featured (first 6) + skeleton
+   Home — Featured (first 6) + skeleton
    ========================================================= */
 async function renderFeatured() {
   const grid = $id('featuredGrid');
   if (!grid) return;
 
-  if (!API_BASE) return; // keep any static featured you put in HTML
+  if (!API_BASE) return; // keep any static featured
 
-  // skeleton
-  grid.innerHTML = skeletonProjectCards(6);
+  // skeleton cards (6)
+  grid.innerHTML = Array.from({length: 6}).map(skeletonCard).join('');
 
   try {
     const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const items = await res.json();
 
-    // first 6 like your FastAPI home view
     const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
-
     if (!featured.length) {
       grid.innerHTML = '<div class="info">No featured projects yet.</div>';
       return;
@@ -295,7 +300,7 @@ async function renderFeatured() {
 }
 
 /* =========================================================
-   CONTACT — post to FastAPI if API_BASE is present
+   Contact — post to FastAPI when API_BASE present
    ========================================================= */
 function setupContactForm() {
   const form = $id('contactForm');
@@ -305,7 +310,7 @@ function setupContactForm() {
   const okEl = $id('contactOk');
   const errEl= $id('contactErr');
 
-  if (!API_BASE) return; // fallback Formspree
+  if (!API_BASE) return; // fallback Formspree action stays
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -348,6 +353,3 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 });
-
-// expose for hamburger
-window.toggleNav = toggleNav;

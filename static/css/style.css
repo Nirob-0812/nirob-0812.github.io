@@ -1045,7 +1045,7 @@ html[data-theme="light"] .skills .bar{
    Animated Day/Night switch
    =========================== */
 .theme-switch{
-  --w: 120px;    /* smaller width */
+  --w: 90px;    /* smaller width */
   --h: 36px;     /* smaller height */
   --pad: 3px;
   --r: 999px;

@@ -549,4 +549,7 @@ D.addEventListener('DOMContentLoaded', () => {
   renderProjects();
   renderCertificates();
   setupContactForm();
+
+  updateAndAnimateStats();  // <-- add this line
 });
+

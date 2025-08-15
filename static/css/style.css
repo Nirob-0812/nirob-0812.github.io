@@ -1041,3 +1041,94 @@ html[data-theme="light"] .skills .bar{
   box-shadow: 0 2px 10px rgba(0,0,0,.05), inset 0 0 0 1px var(--border);
 }
 
+/* ===========================
+   Animated Day/Night switch
+   =========================== */
+.theme-switch{
+  --w: 140px;
+  --h: 42px;
+  --pad: 3px;
+  --r: 999px;
+  --track: #e9ecef;
+  --border: rgba(0,0,0,.08);
+  --label: #2b2f36;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: var(--w);
+  height: var(--h);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--track);
+  cursor: pointer;
+  user-select: none;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .25s ease, border-color .25s ease;
+}
+
+[data-theme="dark"] .theme-switch{
+  --track: #121418;
+  --border: rgba(255,255,255,.08);
+  --label: rgba(255,255,255,.9);
+}
+
+.theme-switch .track{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 14px;
+  pointer-events: none;
+  font: 700 12px/1 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+  letter-spacing: .04em;
+  color: var(--label);
+}
+
+.theme-switch .label{ opacity:.45; transition:opacity .25s ease, transform .25s ease; }
+.theme-switch.is-dark .label.night{ opacity:1; transform:translateY(-1px); }
+.theme-switch:not(.is-dark) .label.day{ opacity:1; transform:translateY(-1px); }
+
+.theme-switch .thumb{
+  --d: calc(var(--h) - var(--pad)*2);
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,.18);
+  display: grid;
+  place-items: center;
+  transform: translateX(calc(var(--w) - var(--d) - var(--pad) - var(--pad)));
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), background .25s ease;
+}
+
+.theme-switch.is-dark .thumb{
+  transform: translateX(0);
+  background: #1c1f26;
+}
+
+.theme-switch .thumb svg{
+  width: 18px; height: 18px;
+  position: absolute;
+  transition: opacity .3s ease, transform .4s ease;
+  color: #3a3f4a;
+}
+[data-theme="dark"] .theme-switch .thumb svg{ color:#e9eef7; }
+
+.theme-switch .thumb .sun  { opacity:1; transform:rotate(0deg)   scale(1); }
+.theme-switch .thumb .moon { opacity:0; transform:rotate(-90deg) scale(.6); }
+.theme-switch.is-dark .thumb .sun  { opacity:0; transform:rotate(90deg)  scale(.6); }
+.theme-switch.is-dark .thumb .moon { opacity:1; transform:rotate(0deg)   scale(1); }
+
+.theme-switch:focus-visible{ box-shadow: 0 0 0 3px rgba(100,150,250,.35); }
+
+@media (prefers-reduced-motion: reduce){
+  .theme-switch, .theme-switch *{ transition:none !important; }
+}
+

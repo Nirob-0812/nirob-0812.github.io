@@ -1,9 +1,18 @@
 /* =========================================================
    Small helpers / config
    ========================================================= */
-const API_BASE = (document.body.dataset.api && document.body.dataset.api !== 'off')
-  ? document.body.dataset.api.replace(/\/+$/, '')
-  : '';
+(function establishApiBase() {
+  // Accept data-api="https://..."  OR  data-api-base="https://..."
+  const b = document.body || document.documentElement;
+  const looksUrl = (v) => typeof v === 'string' && /^https?:\/\//i.test(v);
+  let base = '';
+
+  if (looksUrl(b.dataset.api)) base = b.dataset.api;
+  else if (looksUrl(b.dataset.apiBase)) base = b.dataset.apiBase;
+
+  window.API_BASE = base ? base.replace(/\/+$/, '') : '';
+})();
+const API_BASE = window.API_BASE;
 
 const $id = (sel) => document.getElementById(sel);
 const esc = (s) =>
@@ -58,7 +67,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
 
 /* =========================================================
-   Skeleton helpers (match Featured style)
+   Skeleton helpers (same look as Featured)
    ========================================================= */
 function skeletonCard() {
   return `
@@ -74,11 +83,11 @@ function skeletonCard() {
 }
 function skeletonCountForViewport() {
   const w = window.innerWidth || document.documentElement.clientWidth || 1024;
-  if (w < 480)  return 4;   // phones
-  if (w < 768)  return 6;   // small tablets
-  if (w < 1024) return 8;   // tablets
-  if (w < 1440) return 12;  // laptop
-  return 16;                // wide desktop
+  if (w < 480)  return 4;
+  if (w < 768)  return 6;
+  if (w < 1024) return 8;
+  if (w < 1440) return 12;
+  return 16;
 }
 function renderSkeletonGridInto(container, count) {
   container.innerHTML = `<div class="project-grid">${Array.from({length: count}).map(skeletonCard).join('')}</div>`;
@@ -98,29 +107,22 @@ function animateCount(el, target, duration = 1200) {
   }
   requestAnimationFrame(tick);
 }
-
 function setAndAnimateCount(selector, value) {
   const el = document.querySelector(selector);
   if (!el) return;
   el.setAttribute('data-count', String(value));
   animateCount(el, value);
 }
-
 async function loadAndAnimateStats() {
-  // Years Experience from attribute or default 2021
   const startYear = parseInt(document.body.dataset.expStartYear || '2021', 10);
   const years = Math.max(1, (new Date()).getFullYear() - startYear);
 
-  if (!API_BASE) {
-    // Fallback (no API) – just animate years; others can come from data-count if you want
-    setAndAnimateCount('#countYears', years);
-    return;
-  }
+  if (!API_BASE) { setAndAnimateCount('#countYears', years); return; }
 
   try {
     const [prjRes, certRes] = await Promise.all([
-      fetch(`${API_BASE}/api/projects/`),
-      fetch(`${API_BASE}/api/certificates/`)
+      fetch(`${API_BASE}/api/projects/`, {cache:'no-store'}),
+      fetch(`${API_BASE}/api/certificates/`, {cache:'no-store'})
     ]);
     const [projects, certs] = await Promise.all([prjRes.json(), certRes.json()]);
     setAndAnimateCount('#countProjects', Array.isArray(projects) ? projects.length : 0);
@@ -131,8 +133,6 @@ async function loadAndAnimateStats() {
     setAndAnimateCount('#countYears', years);
   }
 }
-
-// Run counters once the section becomes visible
 (function setupStatsObserver() {
   const container = $id('stats');
   if (!container) return;
@@ -148,30 +148,54 @@ async function loadAndAnimateStats() {
 })();
 
 /* =========================================================
-   Certificates (API + skeleton)
+   Certificates (API + skeleton + wait for images)
    ========================================================= */
+function certSkeletonCard() {
+  return `
+    <article class="cert-card skeleton-card">
+      <div class="cert-thumb">
+        <div class="skeleton skeleton-thumb"></div>
+      </div>
+      <div class="cert-body">
+        <div class="skeleton skeleton-line w-70"></div>
+        <div class="skeleton skeleton-line w-40"></div>
+        <div class="cert-actions">
+          <span class="btn skeleton-line w-30"></span>
+          <span class="btn ghost skeleton-line w-20"></span>
+        </div>
+      </div>
+    </article>`;
+}
+function preloadImages(urls, timeoutMs = 10000) {
+  const waitOne = (url) => new Promise((resolve) => {
+    if (!url) return resolve();
+    const img = new Image();
+    const done = () => resolve();
+    img.onload = img.onerror = done;
+    img.src = url;
+    if (img.decode) { img.decode().then(done).catch(done); }
+  });
+  const all = Promise.all(urls.map(waitOne));
+  const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
+  return Promise.race([all, timer]);
+}
 async function renderCertificates() {
   const grid = document.getElementById('certGrid');
   if (!grid) return;
 
-  // If API is disabled (GH Pages only), keep your static fallback
-  if (!API_BASE) return;
+  if (!API_BASE) return; // keep static fallback when no API
 
-  // Show N skeleton cards (responsive, like Featured)
+  // Show skeletons and keep them if fetch fails (no error message)
   const count = Math.max(6, Math.min(12, skeletonCountForViewport()));
   grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join('');
 
   try {
-    const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch(`${API_BASE}/api/certificates/`, { mode: 'cors', cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const items = await res.json();
+    if (!Array.isArray(items) || !items.length) return; // keep skeletons
 
-    if (!Array.isArray(items) || !items.length) {
-      grid.innerHTML = '<div class="info">No certificates yet.</div>';
-      return;
-    }
-
-    // Prepare final HTML, but don’t inject until images are ready
+    // Build final HTML
     const html = items.map(c => `
       <article class="cert-card">
         <div class="cert-thumb">
@@ -190,14 +214,130 @@ async function renderCertificates() {
       </article>
     `).join('');
 
-    // Wait for all images to be loaded/decoded (or timeout)
+    // Wait for images then swap
     await preloadImages(items.map(i => i.image));
-
-    // Swap skeleton → real cards in one go
     grid.innerHTML = html;
   } catch (err) {
+    console.error('certificates load failed:', err);
+    // leave skeletons on error
+  }
+}
+
+/* =========================================================
+   Projects page — skeleton like Featured
+   ========================================================= */
+const CATEGORY_TITLES = {
+  dl: 'Deep Learning / CV',
+  ml: 'Machine Learning',
+  web: 'Web',
+  app: 'Apps (Flutter)',
+  algo: 'Programming & Algorithms',
+  robotics: 'Robotics',
+  notebook: 'Notebooks / Study',
+  other: 'Other'
+};
+const CATEGORY_ORDER = ['dl', 'ml', 'web', 'app', 'algo', 'robotics', 'notebook', 'other'];
+function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
+
+let projectSkeletonResizeHandler = null;
+
+async function renderProjects() {
+  const mount = $id('projectsApp');
+  if (!mount) return;
+
+  if (!API_BASE) return; // static fallback when no API
+
+  const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
+  drawSkeleton();
+  projectSkeletonResizeHandler = () => drawSkeleton();
+  window.addEventListener('resize', projectSkeletonResizeHandler, { passive: true });
+
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const items = await res.json();
+
+    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    projectSkeletonResizeHandler = null;
+
+    if (!Array.isArray(items) || !items.length) {
+      mount.innerHTML = '<div class="info">No projects yet.</div>';
+      return;
+    }
+
+    const grouped = {};
+    for (const p of items) (grouped[p.category || 'other'] ||= []).push(p);
+
+    let html = '';
+    for (const key of CATEGORY_ORDER) {
+      const list = grouped[key];
+      if (!list || !list.length) continue;
+
+      html += `<section class="project-section">
+        <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
+        <div class="project-grid">`;
+
+      for (const p of list) {
+        const techs = getTechs(p);
+        const href  = p.url || p.href || '#';
+        const desc  = p.summary || p.desc || p.description || '';
+        html += `
+          <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
+            <h3>${esc(p.title)}</h3>
+            <p>${esc(desc)}</p>
+            <div class="tags">
+              ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+            </div>
+          </a>`;
+      }
+
+      html += `</div></section>`;
+    }
+
+    mount.innerHTML = html || '<div class="info">No projects available.</div>';
+  } catch (err) {
     console.error(err);
-    grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
+    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    projectSkeletonResizeHandler = null;
+    mount.innerHTML = '<div class="info">Failed to load projects.</div>';
+  }
+}
+
+/* =========================================================
+   Home — Featured (first 6) + skeleton
+   ========================================================= */
+async function renderFeatured() {
+  const grid = $id('featuredGrid');
+  if (!grid) return;
+
+  if (!API_BASE) return; // keep any static featured
+
+  grid.innerHTML = Array.from({length: 6}).map(skeletonCard).join('');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const items = await res.json();
+
+    const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
+    if (!featured.length) return; // leave skeletons
+
+    grid.innerHTML = featured.map(p => {
+      const href  = p.url || p.href || '#';
+      const desc  = p.summary || p.desc || p.description || '';
+      const techs = getTechs(p);
+      return `
+        <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(desc)}</p>
+          <div class="tags">
+            ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+          </div>
+        </a>`;
+    }).join('');
+  } catch (err) {
+    console.error(err);
+    // keep skeletons on error
   }
 }
 
@@ -242,219 +382,10 @@ async function renderCertificates() {
 })();
 
 /* =========================================================
-   Projects page — skeleton like Featured (no headers while loading)
-   ========================================================= */
-const CATEGORY_TITLES = {
-  dl: 'Deep Learning / CV',
-  ml: 'Machine Learning',
-  web: 'Web',
-  app: 'Apps (Flutter)',
-  algo: 'Programming & Algorithms',
-  robotics: 'Robotics',
-  notebook: 'Notebooks / Study',
-  other: 'Other'
-};
-const CATEGORY_ORDER = ['dl', 'ml', 'web', 'app', 'algo', 'robotics', 'notebook', 'other'];
-function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
-
-let projectSkeletonResizeHandler = null;
-
-async function renderProjects() {
-  const mount = $id('projectsApp');
-  if (!mount) return;
-
-  if (!API_BASE) return; // keep static HTML fallback when no API
-
-  // 1) show a Featured-style grid skeleton (no section names)
-  const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
-  drawSkeleton();
-  // keep it responsive while still loading
-  projectSkeletonResizeHandler = () => drawSkeleton();
-  window.addEventListener('resize', projectSkeletonResizeHandler, { passive: true });
-
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const items = await res.json();
-
-    // stop updating skeleton
-    window.removeEventListener('resize', projectSkeletonResizeHandler);
-    projectSkeletonResizeHandler = null;
-
-    if (!Array.isArray(items) || !items.length) {
-      mount.innerHTML = '<div class="info">No projects yet.</div>';
-      return;
-    }
-
-    // 2) replace skeleton with real grouped sections
-    const grouped = {};
-    for (const p of items) (grouped[p.category || 'other'] ||= []).push(p);
-
-    let html = '';
-    for (const key of CATEGORY_ORDER) {
-      const list = grouped[key];
-      if (!list || !list.length) continue;
-
-      html += `<section class="project-section">
-        <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
-        <div class="project-grid">`;
-
-      for (const p of list) {
-        const techs = getTechs(p);
-        const href  = p.url || p.href || '#';
-        const desc  = p.summary || p.desc || p.description || '';
-        html += `
-          <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
-            <h3>${esc(p.title)}</h3>
-            <p>${esc(desc)}</p>
-            <div class="tags">
-              ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
-            </div>
-          </a>`;
-      }
-
-      html += `</div></section>`;
-    }
-
-    mount.innerHTML = html || '<div class="info">No projects available.</div>';
-  } catch (err) {
-    console.error(err);
-    // stop updating skeleton on error too
-    window.removeEventListener('resize', projectSkeletonResizeHandler);
-    projectSkeletonResizeHandler = null;
-    mount.innerHTML = '<div class="info">Failed to load projects.</div>';
-  }
-}
-
-// --- certificate skeleton + image preloader ---
-function certSkeletonCard() {
-  return `
-    <article class="cert-card skeleton-card">
-      <div class="cert-thumb">
-        <div class="skeleton skeleton-thumb"></div>
-      </div>
-      <div class="cert-body">
-        <div class="skeleton skeleton-line w-70"></div>
-        <div class="skeleton skeleton-line w-40"></div>
-        <div class="cert-actions">
-          <span class="btn skeleton-line w-30"></span>
-          <span class="btn ghost skeleton-line w-20"></span>
-        </div>
-      </div>
-    </article>`;
-}
-
-function preloadImages(urls, timeoutMs = 10000) {
-  const waitOne = (url) => new Promise((resolve) => {
-    if (!url) return resolve();
-    const img = new Image();
-    const done = () => resolve();
-    // prefer decode() to avoid flashes
-    img.onload = img.onerror = done;
-    img.src = url;
-    if (img.decode) { img.decode().then(done).catch(done); }
-  });
-
-  const all = Promise.all(urls.map(waitOne));
-  const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-  // don’t block forever on slow images
-  return Promise.race([all, timer]);
-}
-
-
-/* =========================================================
-   Home — Featured (first 6) + skeleton
-   ========================================================= */
-async function renderFeatured() {
-  const grid = $id('featuredGrid');
-  if (!grid) return;
-
-  if (!API_BASE) return; // keep any static featured
-
-  // skeleton cards (6)
-  grid.innerHTML = Array.from({length: 6}).map(skeletonCard).join('');
-
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const items = await res.json();
-
-    const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
-    if (!featured.length) {
-      grid.innerHTML = '<div class="info">No featured projects yet.</div>';
-      return;
-    }
-
-    grid.innerHTML = featured.map(p => {
-      const href  = p.url || p.href || '#';
-      const desc  = p.summary || p.desc || p.description || '';
-      const techs = getTechs(p);
-      return `
-        <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(desc)}</p>
-          <div class="tags">
-            ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
-          </div>
-        </a>`;
-    }).join('');
-  } catch (err) {
-    console.error(err);
-    grid.innerHTML = '<div class="info">Failed to load featured projects.</div>';
-  }
-}
-
-/* =========================================================
-   Contact — post to FastAPI when API_BASE present
-   ========================================================= */
-function setupContactForm() {
-  const form = $id('contactForm');
-  if (!form) return;
-
-  const btn  = form.querySelector('button[type="submit"]');
-  const okEl = $id('contactOk');
-  const errEl= $id('contactErr');
-
-  if (!API_BASE) return; // fallback Formspree action stays
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    okEl && (okEl.hidden = true);
-    errEl && (errEl.hidden = true);
-    btn && (btn.disabled = true);
-
-    const payload = {
-      name: form.name.value.trim(),
-      email: form.email.value.trim(),
-      subject: form.subject.value.trim(),
-      message: form.message.value.trim(),
-    };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/contact/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      form.reset();
-      okEl && (okEl.hidden = false);
-    } catch (err) {
-      console.error(err);
-      errEl && (errEl.hidden = false);
-    } finally {
-      btn && (btn.disabled = false);
-    }
-  });
-}
-
-/* =========================================================
    Init
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
   renderFeatured();
   renderProjects();
   renderCertificates();
-  setupContactForm();
 });

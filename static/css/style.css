@@ -898,4 +898,33 @@ html[data-theme="light"] .skills .bar{
   padding: 0 1rem;
 }
 
+/* --- Fix: make skeleton buttons look like skeletons (no blue gradient) --- */
+.skeleton-card .btn.skeleton-line,
+.skeleton-card .btn.ghost.skeleton-line {
+  height: 40px;               /* match your real .btn height */
+  border-radius: 999px;
+  /* use the same shimmer as other skeletons */
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, rgba(0,0,0,.08)) 25%,
+    var(--skeleton-highlight, rgba(255,255,255,.18)) 37%,
+    var(--skeleton-base, rgba(0,0,0,.08)) 63%
+  ) !important;
+  background-size: 400% 100% !important;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite !important;
+
+  /* kill the real button styling */
+  border: 0 !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  pointer-events: none !important;
+}
+
+/* (Optional) darker theme tweak if you use data-theme="dark" */
+[data-theme="dark"] {
+  --skeleton-base: rgba(255,255,255,.06);
+  --skeleton-highlight: rgba(255,255,255,.12);
+}
+
+
 

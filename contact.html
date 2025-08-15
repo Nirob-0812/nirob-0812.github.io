@@ -31,28 +31,34 @@
   <main class="container">
     <h1>Contact</h1>
 
-    <div id="contactAlert" class="alert" style="display:none"></div>
+<div id="contactAlert" class="alert" style="display:none"></div>
 
-    <!-- No action: JS will POST to Render API -->
-    <form id="contactForm" class="form" novalidate>
-      <label> Name
-        <input type="text" name="name" placeholder="Your name" required />
-      </label>
+<form
+  id="contactForm"
+  class="form"
+  method="POST"
+  action="https://portfolio-api-z616.onrender.com/contact"
+  novalidate
+>
+  <label> Name
+    <input type="text" name="name" placeholder="Your name" required />
+  </label>
 
-      <label> Email
-        <input type="email" name="email" placeholder="you@example.com" required />
-      </label>
+  <label> Email
+    <input type="email" name="email" placeholder="you@example.com" required />
+  </label>
 
-      <label> Subject
-        <input type="text" name="subject" placeholder="What’s this about?" />
-      </label>
+  <label> Subject
+    <input type="text" name="subject" placeholder="What’s this about?" />
+  </label>
 
-      <label> Message
-        <textarea name="message" rows="7" placeholder="Tell me a bit about your project…" required></textarea>
-      </label>
+  <label> Message
+    <textarea name="message" rows="7" placeholder="Tell me a bit about your project…" required></textarea>
+  </label>
 
-      <button class="btn" type="submit">Send</button>
-    </form>
+  <button class="btn" type="submit">Send</button>
+</form>
+
   </main>
 
   <footer class="site-footer">

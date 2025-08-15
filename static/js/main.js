@@ -69,72 +69,6 @@ const yearEl = $id('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 /* =========================================================
-   Stats counters (Projects / Years / Certificates)
-   ========================================================= */
-function animateCount(el, target, duration = 1200) {
-  if (!el) return;
-  const start = performance.now();
-  const from = 0;
-  const to = Number(target) || 0;
-
-  function tick(now) {
-    const p = Math.min(1, (now - start) / duration);
-    el.textContent = Math.floor(from + (to - from) * p);
-    if (p < 1) requestAnimationFrame(tick);
-    else el.textContent = String(to);
-  }
-  requestAnimationFrame(tick);
-}
-
-async function updateAndAnimateStats() {
-  const box = $id('stats');
-  if (!box) return;
-
-  const elProjects = $id('countProjects');
-  const elYears    = $id('countYears');
-  const elCerts    = $id('countCerts');
-
-  // Fallbacks from HTML
-  let projects = parseInt(box.dataset.fallbackProjects || '0', 10);
-  let certs    = parseInt(box.dataset.fallbackCerts || '0', 10);
-  const startY = parseInt(box.dataset.startYear || '2021', 10);
-  let years    = Math.max(1, new Date().getFullYear() - startY);
-
-  // Try to use API counts when available
-  if (API_BASE) {
-    try {
-      const [pr, cr] = await Promise.all([
-        fetch(`${API_BASE}/api/projects/`).then(r => r.ok ? r.json() : []),
-        fetch(`${API_BASE}/api/certificates/`).then(r => r.ok ? r.json() : []),
-      ]);
-      if (Array.isArray(pr)) projects = pr.length;
-      if (Array.isArray(cr)) certs    = cr.length;
-    } catch (e) {
-      // ignore and keep fallbacks
-      console.warn('Stats: using fallback values.', e);
-    }
-  }
-
-  // Animate once when section enters viewport
-  const run = () => {
-    animateCount(elProjects, projects);
-    animateCount(elYears, years);
-    animateCount(elCerts, certs);
-  };
-
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        run();
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.25 });
-
-  io.observe(box);
-}
-
-/* =========================================================
    Theme toggle
    ========================================================= */
 (function initThemeToggle() {
@@ -539,9 +473,75 @@ function enableSwipePageNav() {
 }
 
 /* =========================================================
+   Stats counters (Projects / Years / Certificates)
+   ========================================================= */
+function animateCount(el, target, duration = 1200) {
+  if (!el) return;
+  const start = performance.now();
+  const from = 0;
+  const to = Number(target) || 0;
+  function tick(now) {
+    const p = Math.min(1, (now - start) / duration);
+    el.textContent = Math.floor(from + (to - from) * p);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = String(to);
+  }
+  requestAnimationFrame(tick);
+}
+
+async function updateAndAnimateStats() {
+  const box = document.getElementById('stats');
+  if (!box) return;
+
+  const elProjects = document.getElementById('countProjects');
+  const elYears    = document.getElementById('countYears');
+  const elCerts    = document.getElementById('countCerts');
+
+  // Fallbacks from HTML
+  let projects = parseInt(box.dataset.fallbackProjects || '0', 10);
+  let certs    = parseInt(box.dataset.fallbackCerts || '0', 10);
+  const startY = parseInt(box.dataset.startYear || '2021', 10);
+  let years    = Math.max(1, new Date().getFullYear() - startY);
+
+  // Try API counts
+  if (API_BASE) {
+    try {
+      const [pr, cr] = await Promise.all([
+        fetch(`${API_BASE}/api/projects/`).then(r => r.ok ? r.json() : []),
+        fetch(`${API_BASE}/api/certificates/`).then(r => r.ok ? r.json() : []),
+      ]);
+      if (Array.isArray(pr)) projects = pr.length;
+      if (Array.isArray(cr)) certs    = cr.length;
+    } catch (_) { /* keep fallbacks */ }
+  }
+
+  const run = () => {
+    animateCount(elProjects, projects);
+    animateCount(elYears, years);
+    animateCount(elCerts, certs);
+  };
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          run();
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+    io.observe(box);
+  } else {
+    // very old browsers: run immediately
+    run();
+  }
+}
+
+
+/* =========================================================
    
    ========================================================= */
-D.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   setupNavOutsideClose();
   enableSwipePageNav();
 
@@ -550,6 +550,6 @@ D.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 
-  updateAndAnimateStats();  // <-- add this line
+  updateAndAnimateStats();   // <-- ensure this line exists
 });
 

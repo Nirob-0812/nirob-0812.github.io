@@ -17,7 +17,7 @@ const API_BASE = (bodyData.api && bodyData.api !== 'off')
 const STATS_DEFAULTS = {
   projects: 27,   // <— change anytime
   certs: 12,      // <— change anytime
-  startYear: 2021 // <— first year you started (used to compute years)
+  startYear: 2024 // <— first year you started (used to compute years)
 };
 
 

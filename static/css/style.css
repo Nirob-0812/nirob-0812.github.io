@@ -1119,8 +1119,8 @@ html[data-theme="light"] .skills .bar{
 
 /* smaller icons inside the thumb */
 .theme-switch .thumb svg{
-  width: 14px;    /* was 18px */
-  height: 14px;   /* was 18px */
+  width: 10px;    /* was 18px */
+  height: 10px;   /* was 18px */
   position: absolute;
   transition: opacity .3s ease, transform .4s ease;
   color: #3a3f4a;

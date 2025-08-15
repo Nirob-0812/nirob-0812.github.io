@@ -85,6 +85,69 @@ function renderSkeletonGridInto(container, count) {
 }
 
 /* =========================================================
+   Stats counters (Projects / Years / Certificates)
+   ========================================================= */
+function animateCount(el, target, duration = 1200) {
+  const startVal = 0;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / duration);
+    el.textContent = Math.floor(startVal + (target - startVal) * p);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = String(target);
+  }
+  requestAnimationFrame(tick);
+}
+
+function setAndAnimateCount(selector, value) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.setAttribute('data-count', String(value));
+  animateCount(el, value);
+}
+
+async function loadAndAnimateStats() {
+  // Years Experience from attribute or default 2021
+  const startYear = parseInt(document.body.dataset.expStartYear || '2021', 10);
+  const years = Math.max(1, (new Date()).getFullYear() - startYear);
+
+  if (!API_BASE) {
+    // Fallback (no API) – just animate years; others can come from data-count if you want
+    setAndAnimateCount('#countYears', years);
+    return;
+  }
+
+  try {
+    const [prjRes, certRes] = await Promise.all([
+      fetch(`${API_BASE}/api/projects/`),
+      fetch(`${API_BASE}/api/certificates/`)
+    ]);
+    const [projects, certs] = await Promise.all([prjRes.json(), certRes.json()]);
+    setAndAnimateCount('#countProjects', Array.isArray(projects) ? projects.length : 0);
+    setAndAnimateCount('#countCerts',    Array.isArray(certs)    ? certs.length    : 0);
+    setAndAnimateCount('#countYears', years);
+  } catch (err) {
+    console.error('stats load failed', err);
+    setAndAnimateCount('#countYears', years);
+  }
+}
+
+// Run counters once the section becomes visible
+(function setupStatsObserver() {
+  const container = $id('stats');
+  if (!container) return;
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        loadAndAnimateStats();
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  io.observe(container);
+})();
+
+/* =========================================================
    Certificates (API + skeleton)
    ========================================================= */
 async function renderCertificates() {
@@ -200,7 +263,7 @@ async function renderProjects() {
   const mount = $id('projectsApp');
   if (!mount) return;
 
-  if (!API_BASE) return; // keep static HTML fallback on GH Pages when no API
+  if (!API_BASE) return; // keep static HTML fallback when no API
 
   // 1) show a Featured-style grid skeleton (no section names)
   const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());

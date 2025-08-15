@@ -1,4 +1,16 @@
 /* =========================================================
+   API base (Render)
+   ========================================================= */
+const BASE_API = "https://portfolio-api-z616.onrender.com";
+
+/* Small helper: fetch JSON with nice errors */
+async function getJSON(url, init) {
+  const res = await fetch(url, init);
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+/* =========================================================
    Mobile nav
    ========================================================= */
 function toggleNav() {
@@ -35,33 +47,25 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
    Active nav item
    ========================================================= */
 (function setActiveNav() {
-  const path = location.pathname.replace(/\/+$/, '') || '/';
+  const path = location.pathname.replace(/\/+$/, "") || "/";
   document.querySelectorAll('.nav a[href]').forEach(a => {
     try {
-      const href = new URL(a.href, location.origin).pathname.replace(/\/+$/, '') || '/';
+      const href = new URL(a.href, location.origin).pathname.replace(/\/+$/, "") || "/";
       if (href === path) a.classList.add('active');
     } catch (_) {}
   });
 })();
 
 /* =========================================================
-   Certificate GRID (client-side render from /api/certificates)
+   Certificates (from API -> fallback stays if API fails)
    ========================================================= */
 async function renderCertificates() {
   const grid = document.getElementById('certGrid');
-  if (!grid) return; // not on the certificates page
-
-  grid.innerHTML = '<div class="info">Loading certificates…</div>';
+  if (!grid) return; // not on certificates page
 
   try {
-    const res = await fetch('/api/certificates/');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const items = await res.json();
-
-    if (!Array.isArray(items) || items.length === 0) {
-      grid.innerHTML = '<div class="info">No certificates yet.</div>';
-      return;
-    }
+    const items = await getJSON(`${BASE_API}/api/certificates/`);
+    if (!Array.isArray(items) || items.length === 0) return; // keep fallback
 
     grid.innerHTML = items.map(c => `
       <article class="cert-card">
@@ -70,17 +74,16 @@ async function renderCertificates() {
         </div>
         <div class="cert-body">
           <h3>${c.title}</h3>
-          <div class="cert-meta">${c.issuer} · ${c.date}</div>
+          <div class="cert-meta">${c.issuer ?? ""} ${c.date ? "· " + c.date : ""}</div>
           <div class="cert-actions">
-            <a class="btn verify" href="${c.verify_url}" target="_blank" rel="noopener">Verify</a>
+            ${c.verify_url ? `<a class="btn verify" href="${c.verify_url}" target="_blank" rel="noopener">Verify</a>` : ""}
             <button class="btn ghost view" data-cert-view="${c.image}">View</button>
           </div>
         </div>
       </article>
     `).join('');
   } catch (err) {
-    console.error(err);
-    grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
+    console.warn("Cert API failed, keeping fallback:", err);
   }
 }
 
@@ -92,7 +95,7 @@ async function renderCertificates() {
   const imgEl  = document.getElementById('certImg');
   if (!modal || !imgEl) return;
 
-  // Open (delegation so it works for dynamically injected cards)
+  // Open via delegation
   document.addEventListener('click', (e) => {
     const trigger = e.target.closest('[data-cert-view]');
     if (!trigger) return;
@@ -107,7 +110,7 @@ async function renderCertificates() {
     document.body.classList.add('no-scroll');
   });
 
-  // Close on backdrop click or Close button
+  // Close on backdrop or button
   modal.addEventListener('click', (e) => {
     if (e.target === modal || e.target.classList.contains('modal-close')) {
       imgEl.src = '';
@@ -129,7 +132,80 @@ async function renderCertificates() {
 })();
 
 /* =========================================================
-   Animate stats when visible
+   Projects (optional dynamic render if #projectGrid exists)
+   ========================================================= */
+async function renderProjects() {
+  const grid = document.getElementById('projectGrid');
+  if (!grid) return;
+
+  try {
+    const items = await getJSON(`${BASE_API}/api/projects/`);
+    if (!Array.isArray(items) || items.length === 0) return; // keep fallback
+
+    grid.innerHTML = items.map(p => {
+      const tags = Array.isArray(p.tags) ? p.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+      const href = p.url || '#';
+      return `
+        <a class="project-card" href="${href}" ${p.url ? 'target="_blank" rel="noopener"' : ''}>
+          <h3>${p.title ?? 'Untitled Project'}</h3>
+          <p>${p.description ?? ''}</p>
+          <div class="tags">${tags}</div>
+        </a>
+      `;
+    }).join('');
+  } catch (err) {
+    console.warn("Projects API failed, keeping fallback:", err);
+  }
+}
+
+/* =========================================================
+   Contact form -> API
+   ========================================================= */
+function setupContactForm() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  const alertBox = document.getElementById('contactAlert');
+  const setAlert = (msg, ok=false) => {
+    if (!alertBox) return;
+    alertBox.style.display = 'block';
+    alertBox.className = `alert ${ok ? 'success' : ''}`;
+    alertBox.textContent = msg;
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fd = new FormData(form);
+    const payload = {
+      name: (fd.get('name') || '').toString().trim(),
+      email: (fd.get('email') || '').toString().trim(),
+      subject: (fd.get('subject') || '').toString().trim(),
+      message: (fd.get('message') || '').toString().trim(),
+    };
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setAlert('Please fill name, email and message.');
+      return;
+    }
+
+    try {
+      await getJSON(`${BASE_API}/api/contact/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      form.reset();
+      setAlert('Thanks! Your message has been sent.', true);
+    } catch (err) {
+      console.error(err);
+      setAlert('Sorry, failed to send your message.');
+    }
+  });
+}
+
+/* =========================================================
+   Animate stats when visible (unchanged)
    ========================================================= */
 function animateCount(el, target, duration = 1200) {
   const startVal = 0;
@@ -154,7 +230,6 @@ function animateCount(el, target, duration = 1200) {
     });
   };
 
-  // Animate once when stats enter the viewport
   const io = new IntersectionObserver((entries, obs) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -172,6 +247,6 @@ function animateCount(el, target, duration = 1200) {
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
+  renderProjects();
+  setupContactForm();
 });
-
-

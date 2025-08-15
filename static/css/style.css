@@ -1046,7 +1046,7 @@ html[data-theme="light"] .skills .bar{
    =========================== */
 .theme-switch{
   /* smaller height → smaller thumb; a bit narrower overall */
-  --w: 80px;
+  --w: 118px;
   --h: 34px;
   --pad: 3px;
   --r: 999px;

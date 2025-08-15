@@ -57,16 +57,49 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
 
 /* =========================================================
+   Skeleton helpers
+   ========================================================= */
+function skeletonProjectCards(count = 6) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    out += `
+      <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
+        <div class="skeleton skeleton-line w-60"></div>
+        <div class="skeleton skeleton-line w-90"></div>
+        <div class="tags">
+          <span class="tag skeleton-tag"></span>
+          <span class="tag skeleton-tag"></span>
+          <span class="tag skeleton-tag"></span>
+        </div>
+      </a>`;
+  }
+  return out;
+}
+function skeletonCertCards(count = 6) {
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    out += `
+      <article class="cert-card skeleton-card">
+        <div class="cert-thumb"><div class="skeleton skeleton-thumb"></div></div>
+        <div class="cert-body">
+          <div class="skeleton skeleton-line w-70"></div>
+          <div class="skeleton skeleton-line w-40"></div>
+        </div>
+      </article>`;
+  }
+  return out;
+}
+
+/* =========================================================
    CERTIFICATES — load from API if available
    ========================================================= */
 async function renderCertificates() {
   const grid = $id('certGrid');
   if (!grid) return;
 
-  // If no API, leave the static fallback that's already in the HTML
-  if (!API_BASE) return;
+  if (!API_BASE) return; // keep your static fallback
 
-  grid.innerHTML = '<div class="info">Loading certificates…</div>';
+  grid.innerHTML = skeletonCertCards(6);
 
   try {
     const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
@@ -110,7 +143,6 @@ async function renderCertificates() {
   document.addEventListener('click', (e) => {
     const trigger = e.target.closest('[data-cert-view]');
     if (!trigger) return;
-
     e.preventDefault();
     const src = trigger.getAttribute('data-cert-view');
     if (!src) return;
@@ -141,7 +173,7 @@ async function renderCertificates() {
 })();
 
 /* =========================================================
-   PROJECTS — grouped like localhost, with tech chips
+   PROJECTS page — grouped sections + skeleton
    ========================================================= */
 const CATEGORY_TITLES = {
   dl: 'Deep Learning / CV',
@@ -163,10 +195,9 @@ async function renderProjects() {
   const mount = $id('projectsApp');
   if (!mount) return;
 
-  // If no API, keep whatever static markup you put in the HTML.
-  if (!API_BASE) return;
+  if (!API_BASE) return; // leave any static fallback
 
-  mount.innerHTML = '<div class="info">Loading projects…</div>';
+  mount.innerHTML = skeletonProjectCards(9);
 
   try {
     const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
@@ -185,7 +216,7 @@ async function renderProjects() {
       (grouped[key] ||= []).push(p);
     }
 
-    // build sections following the localhost order
+    // sections by order
     let html = '';
     for (const key of CATEGORY_ORDER) {
       const list = grouped[key];
@@ -220,8 +251,51 @@ async function renderProjects() {
 }
 
 /* =========================================================
-   CONTACT — post to your FastAPI if API_BASE present.
-   Falls back to Formspree if API_BASE is empty.
+   HOME page — Featured (first 6) + skeleton
+   ========================================================= */
+async function renderFeatured() {
+  const grid = $id('featuredGrid');
+  if (!grid) return;
+
+  if (!API_BASE) return; // keep any static featured you put in HTML
+
+  // skeleton
+  grid.innerHTML = skeletonProjectCards(6);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const items = await res.json();
+
+    // first 6 like your FastAPI home view
+    const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
+
+    if (!featured.length) {
+      grid.innerHTML = '<div class="info">No featured projects yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = featured.map(p => {
+      const href  = p.url || p.href || '#';
+      const desc  = p.summary || p.desc || p.description || '';
+      const techs = getTechs(p);
+      return `
+        <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(desc)}</p>
+          <div class="tags">
+            ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+          </div>
+        </a>`;
+    }).join('');
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = '<div class="info">Failed to load featured projects.</div>';
+  }
+}
+
+/* =========================================================
+   CONTACT — post to FastAPI if API_BASE is present
    ========================================================= */
 function setupContactForm() {
   const form = $id('contactForm');
@@ -231,8 +305,7 @@ function setupContactForm() {
   const okEl = $id('contactOk');
   const errEl= $id('contactErr');
 
-  // If no API configured, do nothing (let Formspree handle it).
-  if (!API_BASE) return;
+  if (!API_BASE) return; // fallback Formspree
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -270,10 +343,11 @@ function setupContactForm() {
    Init
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
-  renderCertificates();
+  renderFeatured();
   renderProjects();
+  renderCertificates();
   setupContactForm();
 });
 
-// expose toggleNav for the hamburger
+// expose for hamburger
 window.toggleNav = toggleNav;

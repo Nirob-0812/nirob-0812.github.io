@@ -880,7 +880,7 @@ html[data-theme="light"] .skills .bar{
 
 /* Certificate skeleton sizing */
 .cert-card.skeleton-card .cert-thumb {
-  aspect-ratio: 4 / 3;   /* keeps a stable rectangle like real thumbs */
+  aspect-ratio: 4 / 3;
   width: 100%;
 }
 .skeleton-thumb {
@@ -889,7 +889,7 @@ html[data-theme="light"] .skills .bar{
   border-radius: 8px;
 }
 
-/* Optional: make skeleton buttons look like small pills */
+/* Skeleton buttons look like pills */
 .btn.skeleton-line {
   display: inline-block;
   height: 2rem;
@@ -897,4 +897,5 @@ html[data-theme="light"] .skills .bar{
   border-radius: 999px;
   padding: 0 1rem;
 }
+
 

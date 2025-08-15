@@ -965,3 +965,79 @@ html[data-theme="light"] .skills .bar{
 .site-footer .socials a svg {
   width: 22px; height: 22px; fill: currentColor; opacity: .9;
 }
+
+/* ===== Footer socials: same visual in light & dark, no purple/blue ===== */
+.site-footer .socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .5rem;
+}
+
+/* lock the icon color, ignore ":visited" purple */
+.site-footer .socials a,
+.site-footer .socials a:link,
+.site-footer .socials a:visited {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  text-decoration: none;
+  color: var(--ink-2);           /* icon color */
+  background: var(--surface-3);  /* circle */
+  box-shadow: 0 1px 0 var(--border), 0 2px 10px rgba(0,0,0,.06);
+  transition: transform .2s ease, background .2s ease, color .2s ease;
+}
+
+.site-footer .socials a:hover {
+  transform: translateY(-2px);
+  background: var(--surface-4);
+  color: var(--ink-1);
+}
+
+.site-footer .socials a svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;  /* follow the 'color' above */
+  stroke: none;
+  pointer-events: none;
+}
+
+/* ===== Theme toggle: correct icon per theme & better contrast ===== */
+.icon-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  transition: background .2s, color .2s, transform .2s;
+}
+.icon-btn:hover {
+  background: var(--surface-4);
+  color: var(--ink-1);
+  transform: translateY(-1px);
+}
+
+/* show moon by default (dark), sun in light */
+.icon-btn svg { display: none; fill: currentColor; }
+.icon-btn .moon { display: inline; }
+[data-theme="light"] .icon-btn .moon { display: none; }
+[data-theme="light"] .icon-btn .sun  { display: inline; }
+
+/* ===== Contact form submit: a bit wider, esp. in light mode ===== */
+.form button[type="submit"].btn {
+  min-width: 140px;        /* wider than before */
+  padding: .85rem 1.4rem;  /* taller & roomier */
+  font-weight: 600;
+}
+[data-theme="light"] .form button[type="submit"].btn {
+  box-shadow: 0 2px 10px rgba(0,0,0,.05), inset 0 0 0 1px var(--border);
+}
+

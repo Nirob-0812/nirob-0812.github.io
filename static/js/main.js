@@ -1,32 +1,66 @@
 /* =========================================================
    Small helpers / config
    ========================================================= */
-(function establishApiBase() {
-  // Accept data-api="https://..."  OR  data-api-base="https://..."
-  const b = document.body || document.documentElement;
-  const looksUrl = (v) => typeof v === 'string' && /^https?:\/\//i.test(v);
-  let base = '';
-
-  if (looksUrl(b.dataset.api)) base = b.dataset.api;
-  else if (looksUrl(b.dataset.apiBase)) base = b.dataset.apiBase;
-
-  window.API_BASE = base ? base.replace(/\/+$/, '') : '';
-})();
-const API_BASE = window.API_BASE;
-
-const $id = (sel) => document.getElementById(sel);
+const D = document;
+const $id = (sel) => D.getElementById(sel);
 const esc = (s) =>
   (s ?? '').toString().replace(/[&<>"']/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+const bodyData = D.body?.dataset || {};
+// Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
+const API_BASE = (bodyData.api && bodyData.api !== 'off')
+  ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, '')
+  : '';
 
 /* =========================================================
    Mobile nav
    ========================================================= */
 function toggleNav() {
   const nav = $id('nav');
-  if (nav) nav.classList.toggle('open');
+  const btn = D.querySelector('.hamburger');
+  if (!nav) return;
+  nav.classList.toggle('open');
+  if (btn) btn.setAttribute('aria-expanded', nav.classList.contains('open') ? 'true' : 'false');
 }
 window.toggleNav = toggleNav;
+
+// Close the mobile menu when tapping/clicking outside it (or pressing Esc)
+function setupNavOutsideClose() {
+  const nav = $id('nav');
+  const btn = D.querySelector('.hamburger');
+  if (!nav || !btn) return;
+
+  const isOutside = (t) => !nav.contains(t) && !btn.contains(t);
+
+  const onAnyPointer = (e) => {
+    if (!nav.classList.contains('open')) return;
+    const target = e.target;
+    if (isOutside(target)) {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  D.addEventListener('click', onAnyPointer, { capture: true });
+  D.addEventListener('touchstart', onAnyPointer, { passive: true, capture: true });
+
+  // Close on Esc
+  D.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('open')) {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // If a link inside the menu is tapped, close it immediately
+  nav.addEventListener('click', (e) => {
+    if (e.target.closest('a')) {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 
 /* =========================================================
    Footer year
@@ -41,7 +75,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   const btn = $id('themeToggle');
   if (!btn) return;
 
-  const root = document.documentElement;
+  const root = D.documentElement;
   const saved = localStorage.getItem('theme');
   if (saved) root.setAttribute('data-theme', saved);
 
@@ -58,7 +92,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
    ========================================================= */
 (function setActiveNav() {
   const path = location.pathname.replace(/\/+$/, '') || '/';
-  document.querySelectorAll('.nav a[href]').forEach(a => {
+  D.querySelectorAll('.nav a[href]').forEach(a => {
     try {
       const href = new URL(a.href, location.origin).pathname.replace(/\/+$/, '') || '/';
       if (href === path) a.classList.add('active');
@@ -67,7 +101,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
 
 /* =========================================================
-   Skeleton helpers (same look as Featured)
+   Skeleton helpers (match Featured style)
    ========================================================= */
 function skeletonCard() {
   return `
@@ -82,73 +116,19 @@ function skeletonCard() {
     </a>`;
 }
 function skeletonCountForViewport() {
-  const w = window.innerWidth || document.documentElement.clientWidth || 1024;
-  if (w < 480)  return 4;
-  if (w < 768)  return 6;
-  if (w < 1024) return 8;
-  if (w < 1440) return 12;
-  return 16;
+  const w = window.innerWidth || D.documentElement.clientWidth || 1024;
+  if (w < 480)  return 4;   // phones
+  if (w < 768)  return 6;   // small tablets
+  if (w < 1024) return 8;   // tablets
+  if (w < 1440) return 12;  // laptop
+  return 16;                // wide desktop
 }
 function renderSkeletonGridInto(container, count) {
   container.innerHTML = `<div class="project-grid">${Array.from({length: count}).map(skeletonCard).join('')}</div>`;
 }
 
 /* =========================================================
-   Stats counters (Projects / Years / Certificates)
-   ========================================================= */
-function animateCount(el, target, duration = 1200) {
-  const startVal = 0;
-  const start = performance.now();
-  function tick(now) {
-    const p = Math.min(1, (now - start) / duration);
-    el.textContent = Math.floor(startVal + (target - startVal) * p);
-    if (p < 1) requestAnimationFrame(tick);
-    else el.textContent = String(target);
-  }
-  requestAnimationFrame(tick);
-}
-function setAndAnimateCount(selector, value) {
-  const el = document.querySelector(selector);
-  if (!el) return;
-  el.setAttribute('data-count', String(value));
-  animateCount(el, value);
-}
-async function loadAndAnimateStats() {
-  const startYear = parseInt(document.body.dataset.expStartYear || '2024', 10);
-  const years = Math.max(1, (new Date()).getFullYear() - startYear);
-
-  if (!API_BASE) { setAndAnimateCount('#countYears', years); return; }
-
-  try {
-    const [prjRes, certRes] = await Promise.all([
-      fetch(`${API_BASE}/api/projects/`, {cache:'no-store'}),
-      fetch(`${API_BASE}/api/certificates/`, {cache:'no-store'})
-    ]);
-    const [projects, certs] = await Promise.all([prjRes.json(), certRes.json()]);
-    setAndAnimateCount('#countProjects', Array.isArray(projects) ? projects.length : 0);
-    setAndAnimateCount('#countCerts',    Array.isArray(certs)    ? certs.length    : 0);
-    setAndAnimateCount('#countYears', years);
-  } catch (err) {
-    console.error('stats load failed', err);
-    setAndAnimateCount('#countYears', years);
-  }
-}
-(function setupStatsObserver() {
-  const container = $id('stats');
-  if (!container) return;
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        loadAndAnimateStats();
-        obs.disconnect();
-      }
-    });
-  }, { threshold: 0.3 });
-  io.observe(container);
-})();
-
-/* =========================================================
-   Certificates (API + skeleton + wait for images)
+   Certificates (API + skeleton)
    ========================================================= */
 function certSkeletonCard() {
   return `
@@ -166,6 +146,7 @@ function certSkeletonCard() {
       </div>
     </article>`;
 }
+
 function preloadImages(urls, timeoutMs = 10000) {
   const waitOne = (url) => new Promise((resolve) => {
     if (!url) return resolve();
@@ -175,27 +156,26 @@ function preloadImages(urls, timeoutMs = 10000) {
     img.src = url;
     if (img.decode) { img.decode().then(done).catch(done); }
   });
+
   const all = Promise.all(urls.map(waitOne));
   const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
   return Promise.race([all, timer]);
 }
+
 async function renderCertificates() {
-  const grid = document.getElementById('certGrid');
+  const grid = $id('certGrid');
   if (!grid) return;
+  if (!API_BASE) return; // keep any static fallback
 
-  if (!API_BASE) return; // keep static fallback when no API
-
-  // Show skeletons and keep them if fetch fails (no error message)
   const count = Math.max(6, Math.min(12, skeletonCountForViewport()));
   grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join('');
 
   try {
-    const res = await fetch(`${API_BASE}/api/certificates/`, { mode: 'cors', cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const items = await res.json();
-    if (!Array.isArray(items) || !items.length) return; // keep skeletons
+    if (!Array.isArray(items) || !items.length) return;
 
-    // Build final HTML
     const html = items.map(c => `
       <article class="cert-card">
         <div class="cert-thumb">
@@ -214,17 +194,57 @@ async function renderCertificates() {
       </article>
     `).join('');
 
-    // Wait for images then swap
     await preloadImages(items.map(i => i.image));
     grid.innerHTML = html;
   } catch (err) {
-    console.error('certificates load failed:', err);
-    // leave skeletons on error
+    console.error(err);
+    // keep skeleton if you prefer; otherwise show a message:
+    grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
   }
 }
 
 /* =========================================================
-   Projects page — skeleton like Featured
+   Certificate Modal
+   ========================================================= */
+(function setupCertModal() {
+  const modal = $id('certModal');
+  const imgEl  = $id('certImg');
+  if (!modal || !imgEl) return;
+
+  D.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-cert-view]');
+    if (!trigger) return;
+    e.preventDefault();
+    const src = trigger.getAttribute('data-cert-view');
+    if (!src) return;
+
+    imgEl.src = src;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    D.body.classList.add('no-scroll');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal-close')) {
+      imgEl.src = '';
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      D.body.classList.remove('no-scroll');
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      imgEl.src = '';
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      D.body.classList.remove('no-scroll');
+    }
+  });
+})();
+
+/* =========================================================
+   Projects page — skeleton like Featured (no headers while loading)
    ========================================================= */
 const CATEGORY_TITLES = {
   dl: 'Deep Learning / CV',
@@ -244,8 +264,7 @@ let projectSkeletonResizeHandler = null;
 async function renderProjects() {
   const mount = $id('projectsApp');
   if (!mount) return;
-
-  if (!API_BASE) return; // static fallback when no API
+  if (!API_BASE) return;
 
   const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
   drawSkeleton();
@@ -253,7 +272,7 @@ async function renderProjects() {
   window.addEventListener('resize', projectSkeletonResizeHandler, { passive: true });
 
   try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const items = await res.json();
 
@@ -309,18 +328,17 @@ async function renderProjects() {
 async function renderFeatured() {
   const grid = $id('featuredGrid');
   if (!grid) return;
-
-  if (!API_BASE) return; // keep any static featured
+  if (!API_BASE) return;
 
   grid.innerHTML = Array.from({length: 6}).map(skeletonCard).join('');
 
   try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const items = await res.json();
 
     const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
-    if (!featured.length) return; // leave skeletons
+    if (!featured.length) return;
 
     grid.innerHTML = featured.map(p => {
       const href  = p.url || p.href || '#';
@@ -337,55 +355,132 @@ async function renderFeatured() {
     }).join('');
   } catch (err) {
     console.error(err);
-    // keep skeletons on error
+    grid.innerHTML = '<div class="info">Failed to load featured projects.</div>';
   }
 }
 
 /* =========================================================
-   Certificate Modal
+   Contact — post to FastAPI when API_BASE present
    ========================================================= */
-(function setupCertModal() {
-  const modal = $id('certModal');
-  const imgEl  = $id('certImg');
-  if (!modal || !imgEl) return;
+function setupContactForm() {
+  const form = $id('contactForm');
+  if (!form) return;
 
-  document.addEventListener('click', (e) => {
-    const trigger = e.target.closest('[data-cert-view]');
-    if (!trigger) return;
+  const btn  = form.querySelector('button[type="submit"]');
+  const okEl = $id('contactOk');
+  const errEl= $id('contactErr');
+
+  if (!API_BASE) return; // fallback Formspree action stays
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const src = trigger.getAttribute('data-cert-view');
-    if (!src) return;
 
-    imgEl.src = src;
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('no-scroll');
-  });
+    okEl && (okEl.hidden = true);
+    errEl && (errEl.hidden = true);
+    btn && (btn.disabled = true);
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.classList.contains('modal-close')) {
-      imgEl.src = '';
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('no-scroll');
+    const payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      subject: form.subject.value.trim(),
+      message: form.message.value.trim(),
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/contact/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      form.reset();
+      okEl && (okEl.hidden = false);
+    } catch (err) {
+      console.error(err);
+      errEl && (errEl.hidden = false);
+    } finally {
+      btn && (btn.disabled = false);
     }
   });
+}
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
-      imgEl.src = '';
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('no-scroll');
+/* =========================================================
+   Tablet swipe navigation (left/right) between pages
+   ========================================================= */
+function enableSwipePageNav() {
+  // Only for tablet-ish widths
+  const isTabletWidth = () => {
+    const w = window.innerWidth || D.documentElement.clientWidth || 1024;
+    return w >= 600 && w <= 1100;
+  };
+
+  // Map page order
+  const pages = ['/index.html', '/about.html', '/projects.html', '/resume.html', '/certificates.html'];
+  const normalize = (p) => (p === '/' ? '/index.html' : p);
+
+  let startX = 0, startY = 0, tracking = false;
+
+  const ignoreTarget = (t) => !!t.closest('a, button, input, textarea, select, label, .no-swipe, .nav');
+
+  function onStart(e) {
+    if (!isTabletWidth()) return;
+    const t = (e.touches && e.touches[0]) || e;
+    if (!t || ignoreTarget(e.target)) return;
+    // Don’t start when menu is open
+    const nav = $id('nav');
+    if (nav && nav.classList.contains('open')) return;
+
+    tracking = true;
+    startX = t.clientX;
+    startY = t.clientY;
+  }
+
+  function onMove(e) {
+    if (!tracking) return;
+    const t = (e.touches && e.touches[0]) || e;
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+
+    // Cancel if mostly vertical scroll
+    if (Math.abs(dy) > 60) {
+      tracking = false;
+      return;
     }
-  });
-})();
+
+    // Trigger on significant horizontal move
+    const THRESH = 80;
+    if (Math.abs(dx) > THRESH) {
+      tracking = false;
+      const curr = normalize(location.pathname.replace(/\/+$/, '') || '/index.html');
+      const idx = pages.indexOf(curr);
+      if (idx === -1) return;
+      const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1)  // swipe left → next
+                               : Math.max(idx - 1, 0);                // swipe right → prev
+      if (targetIdx !== idx) location.href = pages[targetIdx];
+    }
+  }
+
+  function onEnd() { tracking = false; }
+
+  window.addEventListener('touchstart', onStart, { passive: true });
+  window.addEventListener('touchmove',  onMove,  { passive: true });
+  window.addEventListener('touchend',   onEnd,   { passive: true });
+
+  // Pointer events fallback (stylus/trackpad)
+  window.addEventListener('pointerdown', onStart, { passive: true });
+  window.addEventListener('pointermove', onMove,  { passive: true });
+  window.addEventListener('pointerup',   onEnd,   { passive: true });
+}
 
 /* =========================================================
    Init
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+D.addEventListener('DOMContentLoaded', () => {
+  setupNavOutsideClose();
+  enableSwipePageNav();
+
   renderFeatured();
   renderProjects();
   renderCertificates();
+  setupContactForm();
 });

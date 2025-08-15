@@ -925,34 +925,32 @@ html[data-theme="light"] .skills .bar{
   --skeleton-base: rgba(255,255,255,.06);
   --skeleton-highlight: rgba(255,255,255,.12);
 }
-
-/* --- Footer: always centered, all breakpoints --- */
-.site-footer {
-  padding: 1.5rem 0;
-}
-
+/* === Footer: force the stacked centered layout on all breakpoints === */
 .site-footer .footer-grid {
-  /* force a vertical stack: text on top, icons below */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  display: flex !important;          /* override any grid rules */
+  flex-direction: column !important; /* text on top, icons below */
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
   gap: 0.9rem;
+  width: 100%;
 }
 
-/* icon row */
+.site-footer .copyright {
+  margin: 0 auto;                    /* keep the line centered */
+}
+
 .site-footer .socials {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   gap: 0.9rem;
-  flex-wrap: wrap;                /* wrap nicely on small screens */
-  margin: 0;                      /* reset any old spacing */
+  flex-wrap: wrap;
+  margin: 0 auto;
   padding: 0;
 }
 
-/* individual circular icon buttons */
+/* icon pills (keep your existing styles if you like) */
 .site-footer .socials a {
   width: 42px;
   height: 42px;
@@ -964,18 +962,6 @@ html[data-theme="light"] .skills .bar{
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-.site-footer .socials a:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 0 1px var(--accent, #7f5af0) inset,
-    0 6px 16px rgba(0,0,0,.15);
-}
-
-/* make sure the SVGs are centered and inherit color */
 .site-footer .socials a svg {
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
-  opacity: .9;
+  width: 22px; height: 22px; fill: currentColor; opacity: .9;
 }
-

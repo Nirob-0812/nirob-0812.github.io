@@ -1,18 +1,19 @@
-
 /* =========================================================
    Small helpers / config
    ========================================================= */
 const D = document;
 const $id = (sel) => D.getElementById(sel);
 const esc = (s) =>
-  (s ?? '').toString().replace(/[&<>"']/g, m =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  (s ?? "").toString().replace(/[&<>"']/g, (m) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+  );
 
 const bodyData = D.body?.dataset || {};
 // Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
-const API_BASE = (bodyData.api && bodyData.api !== 'off')
-  ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, '')
-  : '';
+const API_BASE =
+  bodyData.api && bodyData.api !== "off"
+    ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, "")
+    : "";
 
 // Fallback values if you don't provide data-* attributes in HTML
 const STATS_DEFAULTS = {
@@ -21,52 +22,55 @@ const STATS_DEFAULTS = {
   startYear: 2024 // <— first year you started (used to compute years)
 };
 
-
 /* =========================================================
    Mobile nav
    ========================================================= */
 function toggleNav() {
-  const nav = $id('nav');
-  const btn = D.querySelector('.hamburger');
+  const nav = $id("nav");
+  const btn = D.querySelector(".hamburger");
   if (!nav) return;
-  nav.classList.toggle('open');
-  if (btn) btn.setAttribute('aria-expanded', nav.classList.contains('open') ? 'true' : 'false');
+  nav.classList.toggle("open");
+  if (btn)
+    btn.setAttribute(
+      "aria-expanded",
+      nav.classList.contains("open") ? "true" : "false"
+    );
 }
 window.toggleNav = toggleNav;
 
 // Close the mobile menu when tapping/clicking outside it (or pressing Esc)
 function setupNavOutsideClose() {
-  const nav = $id('nav');
-  const btn = D.querySelector('.hamburger');
+  const nav = $id("nav");
+  const btn = D.querySelector(".hamburger");
   if (!nav || !btn) return;
 
   const isOutside = (t) => !nav.contains(t) && !btn.contains(t);
 
   const onAnyPointer = (e) => {
-    if (!nav.classList.contains('open')) return;
+    if (!nav.classList.contains("open")) return;
     const target = e.target;
     if (isOutside(target)) {
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
+      nav.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
     }
   };
 
-  D.addEventListener('click', onAnyPointer, { capture: true });
-  D.addEventListener('touchstart', onAnyPointer, { passive: true, capture: true });
+  D.addEventListener("click", onAnyPointer, { capture: true });
+  D.addEventListener("touchstart", onAnyPointer, { passive: true, capture: true });
 
   // Close on Esc
-  D.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav.classList.contains('open')) {
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
+  D.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav.classList.contains("open")) {
+      nav.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
     }
   });
 
   // If a link inside the menu is tapped, close it immediately
-  nav.addEventListener('click', (e) => {
-    if (e.target.closest('a')) {
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
+  nav.addEventListener("click", (e) => {
+    if (e.target.closest("a")) {
+      nav.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
     }
   });
 }
@@ -74,52 +78,57 @@ function setupNavOutsideClose() {
 /* =========================================================
    Footer year
    ========================================================= */
-const yearEl = $id('year');
+const yearEl = $id("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===========================
-// Animated theme switch logic
-// ===========================
-(function initThemeToggle(){
-  const btn = document.getElementById('themeToggle');
+/* =========================================================
+   Animated theme switch logic
+   ========================================================= */
+(function initThemeToggle() {
+  const btn = $id("themeToggle");
   if (!btn) return;
 
   const root = document.documentElement;
 
   // Default to DAY (light) if nothing saved
-  let theme = localStorage.getItem('theme') || 'light';
+  let theme = localStorage.getItem("theme") || "light";
   apply(theme);
 
-  function apply(t){
-    const dark = t === 'dark';
-    root.setAttribute('data-theme', t);
-    btn.classList.toggle('is-dark', dark);
-    btn.setAttribute('aria-checked', dark ? 'true' : 'false');
-    btn.setAttribute('aria-label', dark ? 'Switch to day mode' : 'Switch to night mode');
+  // Enable animations after first paint (prevents initial jump)
+  requestAnimationFrame(() => btn.classList.add("enable-anim"));
+
+  function apply(t) {
+    const dark = t === "dark";
+    root.setAttribute("data-theme", t);
+    btn.classList.toggle("is-dark", dark);
+    btn.setAttribute("aria-checked", dark ? "true" : "false");
+    btn.setAttribute("aria-label", dark ? "Switch to day mode" : "Switch to night mode");
   }
 
-  function toggle(){
-    theme = (theme === 'dark') ? 'light' : 'dark';
-    localStorage.setItem('theme', theme);
+  function toggle() {
+    theme = theme === "dark" ? "light" : "dark";
+    localStorage.setItem("theme", theme);
     apply(theme);
   }
 
-  btn.addEventListener('click', toggle);
-  btn.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
+  btn.addEventListener("click", toggle);
+  btn.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      toggle();
+    }
   });
 })();
-
 
 /* =========================================================
    Active nav item
    ========================================================= */
 (function setActiveNav() {
-  const path = location.pathname.replace(/\/+$/, '') || '/';
-  D.querySelectorAll('.nav a[href]').forEach(a => {
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  D.querySelectorAll(".nav a[href]").forEach((a) => {
     try {
-      const href = new URL(a.href, location.origin).pathname.replace(/\/+$/, '') || '/';
-      if (href === path) a.classList.add('active');
+      const href = new URL(a.href, location.origin).pathname.replace(/\/+$/, "") || "/";
+      if (href === path) a.classList.add("active");
     } catch (_) {}
   });
 })();
@@ -141,14 +150,16 @@ function skeletonCard() {
 }
 function skeletonCountForViewport() {
   const w = window.innerWidth || D.documentElement.clientWidth || 1024;
-  if (w < 480)  return 4;   // phones
-  if (w < 768)  return 6;   // small tablets
-  if (w < 1024) return 8;   // tablets
-  if (w < 1440) return 12;  // laptop
-  return 16;                // wide desktop
+  if (w < 480) return 4;   // phones
+  if (w < 768) return 6;   // small tablets
+  if (w < 1024) return 8;  // tablets
+  if (w < 1440) return 12; // laptop
+  return 16;               // wide desktop
 }
 function renderSkeletonGridInto(container, count) {
-  container.innerHTML = `<div class="project-grid">${Array.from({length: count}).map(skeletonCard).join('')}</div>`;
+  container.innerHTML = `<div class="project-grid">${Array.from({ length: count })
+    .map(skeletonCard)
+    .join("")}</div>`;
 }
 
 /* =========================================================
@@ -172,14 +183,17 @@ function certSkeletonCard() {
 }
 
 function preloadImages(urls, timeoutMs = 10000) {
-  const waitOne = (url) => new Promise((resolve) => {
-    if (!url) return resolve();
-    const img = new Image();
-    const done = () => resolve();
-    img.onload = img.onerror = done;
-    img.src = url;
-    if (img.decode) { img.decode().then(done).catch(done); }
-  });
+  const waitOne = (url) =>
+    new Promise((resolve) => {
+      if (!url) return resolve();
+      const img = new Image();
+      const done = () => resolve();
+      img.onload = img.onerror = done;
+      img.src = url;
+      if (img.decode) {
+        img.decode().then(done).catch(done);
+      }
+    });
 
   const all = Promise.all(urls.map(waitOne));
   const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
@@ -187,20 +201,22 @@ function preloadImages(urls, timeoutMs = 10000) {
 }
 
 async function renderCertificates() {
-  const grid = $id('certGrid');
+  const grid = $id("certGrid");
   if (!grid) return;
   if (!API_BASE) return; // keep any static fallback
 
   const count = Math.max(6, Math.min(12, skeletonCountForViewport()));
-  grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join('');
+  grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join("");
 
   try {
-    const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: "omit" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
     const items = await res.json();
     if (!Array.isArray(items) || !items.length) return;
 
-    const html = items.map(c => `
+    const html = items
+      .map(
+        (c) => `
       <article class="cert-card">
         <div class="cert-thumb">
           <img src="${esc(c.image)}" alt="${esc(c.title)}">
@@ -208,21 +224,22 @@ async function renderCertificates() {
         <div class="cert-body">
           <h3>${esc(c.title)}</h3>
           <div class="cert-meta">
-            ${esc(c.issuer || '')}${c.date ? ' · ' + esc(c.date) : ''}
+            ${esc(c.issuer || "")}${c.date ? " · " + esc(c.date) : ""}
           </div>
           <div class="cert-actions">
-            ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ''}
+            ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ""}
             <button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button>
           </div>
         </div>
       </article>
-    `).join('');
+    `
+      )
+      .join("");
 
-    await preloadImages(items.map(i => i.image));
+    await preloadImages(items.map((i) => i.image));
     grid.innerHTML = html;
   } catch (err) {
     console.error(err);
-    // keep skeleton if you prefer; otherwise show a message:
     grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
   }
 }
@@ -231,38 +248,38 @@ async function renderCertificates() {
    Certificate Modal
    ========================================================= */
 (function setupCertModal() {
-  const modal = $id('certModal');
-  const imgEl  = $id('certImg');
+  const modal = $id("certModal");
+  const imgEl = $id("certImg");
   if (!modal || !imgEl) return;
 
-  D.addEventListener('click', (e) => {
-    const trigger = e.target.closest('[data-cert-view]');
+  D.addEventListener("click", (e) => {
+    const trigger = e.target.closest("[data-cert-view]");
     if (!trigger) return;
     e.preventDefault();
-    const src = trigger.getAttribute('data-cert-view');
+    const src = trigger.getAttribute("data-cert-view");
     if (!src) return;
 
     imgEl.src = src;
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    D.body.classList.add('no-scroll');
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    D.body.classList.add("no-scroll");
   });
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.classList.contains('modal-close')) {
-      imgEl.src = '';
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      D.body.classList.remove('no-scroll');
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal || e.target.classList.contains("modal-close")) {
+      imgEl.src = "";
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      D.body.classList.remove("no-scroll");
     }
   });
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
-      imgEl.src = '';
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      D.body.classList.remove('no-scroll');
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) {
+      imgEl.src = "";
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      D.body.classList.remove("no-scroll");
     }
   });
 })();
@@ -271,47 +288,49 @@ async function renderCertificates() {
    Projects page — skeleton like Featured (no headers while loading)
    ========================================================= */
 const CATEGORY_TITLES = {
-  dl: 'Deep Learning / CV',
-  ml: 'Machine Learning',
-  web: 'Web',
-  app: 'Apps (Flutter)',
-  algo: 'Programming & Algorithms',
-  robotics: 'Robotics',
-  notebook: 'Notebooks / Study',
-  other: 'Other'
+  dl: "Deep Learning / CV",
+  ml: "Machine Learning",
+  web: "Web",
+  app: "Apps (Flutter)",
+  algo: "Programming & Algorithms",
+  robotics: "Robotics",
+  notebook: "Notebooks / Study",
+  other: "Other",
 };
-const CATEGORY_ORDER = ['dl', 'ml', 'web', 'app', 'algo', 'robotics', 'notebook', 'other'];
-function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
+const CATEGORY_ORDER = ["dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
+function getTechs(p) {
+  return p.techs || p.tech || p.tags || p.stack || [];
+}
 
 let projectSkeletonResizeHandler = null;
 
 async function renderProjects() {
-  const mount = $id('projectsApp');
+  const mount = $id("projectsApp");
   if (!mount) return;
   if (!API_BASE) return;
 
   const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
   drawSkeleton();
   projectSkeletonResizeHandler = () => drawSkeleton();
-  window.addEventListener('resize', projectSkeletonResizeHandler, { passive: true });
+  window.addEventListener("resize", projectSkeletonResizeHandler, { passive: true });
 
   try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: "omit" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
     const items = await res.json();
 
-    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    window.removeEventListener("resize", projectSkeletonResizeHandler);
     projectSkeletonResizeHandler = null;
 
     if (!Array.isArray(items) || !items.length) {
-      mount.innerHTML = '<div class="info">No projects yet.</div>';
+      mount.innerHTML = "<div class=\"info\">No projects yet.</div>";
       return;
     }
 
     const grouped = {};
-    for (const p of items) (grouped[p.category || 'other'] ||= []).push(p);
+    for (const p of items) (grouped[p.category || "other"] ||= []).push(p);
 
-    let html = '';
+    let html = "";
     for (const key of CATEGORY_ORDER) {
       const list = grouped[key];
       if (!list || !list.length) continue;
@@ -322,14 +341,20 @@ async function renderProjects() {
 
       for (const p of list) {
         const techs = getTechs(p);
-        const href  = p.url || p.href || '#';
-        const desc  = p.summary || p.desc || p.description || '';
+        const href = p.url || p.href || "#";
+        const desc = p.summary || p.desc || p.description || "";
         html += `
-          <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
+          <a class="project-card" ${
+            href && href !== "#"
+              ? `href="${esc(href)}" target="_blank" rel="noopener"`
+              : 'href="#"'
+          }>
             <h3>${esc(p.title)}</h3>
             <p>${esc(desc)}</p>
             <div class="tags">
-              ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+              ${(Array.isArray(techs) ? techs : [])
+                .map((t) => `<span class="tag">${esc(t)}</span>`)
+                .join("")}
             </div>
           </a>`;
       }
@@ -340,7 +365,7 @@ async function renderProjects() {
     mount.innerHTML = html || '<div class="info">No projects available.</div>';
   } catch (err) {
     console.error(err);
-    window.removeEventListener('resize', projectSkeletonResizeHandler);
+    window.removeEventListener("resize", projectSkeletonResizeHandler);
     projectSkeletonResizeHandler = null;
     mount.innerHTML = '<div class="info">Failed to load projects.</div>';
   }
@@ -350,33 +375,41 @@ async function renderProjects() {
    Home — Featured (first 6) + skeleton
    ========================================================= */
 async function renderFeatured() {
-  const grid = $id('featuredGrid');
+  const grid = $id("featuredGrid");
   if (!grid) return;
   if (!API_BASE) return;
 
-  grid.innerHTML = Array.from({length: 6}).map(skeletonCard).join('');
+  grid.innerHTML = Array.from({ length: 6 }).map(skeletonCard).join("");
 
   try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: 'omit' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: "omit" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
     const items = await res.json();
 
-    const featured = (Array.isArray(items) ? items.slice(0, 6) : []);
+    const featured = Array.isArray(items) ? items.slice(0, 6) : [];
     if (!featured.length) return;
 
-    grid.innerHTML = featured.map(p => {
-      const href  = p.url || p.href || '#';
-      const desc  = p.summary || p.desc || p.description || '';
-      const techs = getTechs(p);
-      return `
-        <a class="project-card" ${href && href !== '#' ? `href="${esc(href)}" target="_blank" rel="noopener"` : 'href="#"'}>
+    grid.innerHTML = featured
+      .map((p) => {
+        const href = p.url || p.href || "#";
+        const desc = p.summary || p.desc || p.description || "";
+        const techs = getTechs(p);
+        return `
+        <a class="project-card" ${
+          href && href !== "#"
+            ? `href="${esc(href)}" target="_blank" rel="noopener"`
+            : 'href="#"'
+        }>
           <h3>${esc(p.title)}</h3>
           <p>${esc(desc)}</p>
           <div class="tags">
-            ${(Array.isArray(techs) ? techs : []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+            ${(Array.isArray(techs) ? techs : [])
+              .map((t) => `<span class="tag">${esc(t)}</span>`)
+              .join("")}
           </div>
         </a>`;
-    }).join('');
+      })
+      .join("");
   } catch (err) {
     console.error(err);
     grid.innerHTML = '<div class="info">Failed to load featured projects.</div>';
@@ -387,16 +420,16 @@ async function renderFeatured() {
    Contact — post to FastAPI when API_BASE present
    ========================================================= */
 function setupContactForm() {
-  const form = $id('contactForm');
+  const form = $id("contactForm");
   if (!form) return;
 
-  const btn  = form.querySelector('button[type="submit"]');
-  const okEl = $id('contactOk');
-  const errEl= $id('contactErr');
+  const btn = form.querySelector('button[type="submit"]');
+  const okEl = $id("contactOk");
+  const errEl = $id("contactErr");
 
   if (!API_BASE) return; // fallback Formspree action stays
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     okEl && (okEl.hidden = true);
@@ -412,11 +445,11 @@ function setupContactForm() {
 
     try {
       const res = await fetch(`${API_BASE}/api/contact/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
       form.reset();
       okEl && (okEl.hidden = false);
     } catch (err) {
@@ -439,20 +472,29 @@ function enableSwipePageNav() {
   };
 
   // Map page order
-  const pages = ['/index.html', '/about.html', '/projects.html', '/resume.html', '/certificates.html'];
-  const normalize = (p) => (p === '/' ? '/index.html' : p);
+  const pages = [
+    "/index.html",
+    "/about.html",
+    "/projects.html",
+    "/resume.html",
+    "/certificates.html",
+  ];
+  const normalize = (p) => (p === "/" ? "/index.html" : p);
 
-  let startX = 0, startY = 0, tracking = false;
+  let startX = 0,
+    startY = 0,
+    tracking = false;
 
-  const ignoreTarget = (t) => !!t.closest('a, button, input, textarea, select, label, .no-swipe, .nav');
+  const ignoreTarget = (t) =>
+    !!t.closest("a, button, input, textarea, select, label, .no-swipe, .nav");
 
   function onStart(e) {
     if (!isTabletWidth()) return;
     const t = (e.touches && e.touches[0]) || e;
     if (!t || ignoreTarget(e.target)) return;
     // Don’t start when menu is open
-    const nav = $id('nav');
-    if (nav && nav.classList.contains('open')) return;
+    const nav = $id("nav");
+    if (nav && nav.classList.contains("open")) return;
 
     tracking = true;
     startX = t.clientX;
@@ -475,25 +517,28 @@ function enableSwipePageNav() {
     const THRESH = 80;
     if (Math.abs(dx) > THRESH) {
       tracking = false;
-      const curr = normalize(location.pathname.replace(/\/+$/, '') || '/index.html');
+      const curr =
+        normalize(location.pathname.replace(/\/+$/, "")) || "/index.html";
       const idx = pages.indexOf(curr);
       if (idx === -1) return;
-      const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1)  // swipe left → next
-                               : Math.max(idx - 1, 0);                // swipe right → prev
+      const targetIdx =
+        dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0);
       if (targetIdx !== idx) location.href = pages[targetIdx];
     }
   }
 
-  function onEnd() { tracking = false; }
+  function onEnd() {
+    tracking = false;
+  }
 
-  window.addEventListener('touchstart', onStart, { passive: true });
-  window.addEventListener('touchmove',  onMove,  { passive: true });
-  window.addEventListener('touchend',   onEnd,   { passive: true });
+  window.addEventListener("touchstart", onStart, { passive: true });
+  window.addEventListener("touchmove", onMove, { passive: true });
+  window.addEventListener("touchend", onEnd, { passive: true });
 
   // Pointer events fallback (stylus/trackpad)
-  window.addEventListener('pointerdown', onStart, { passive: true });
-  window.addEventListener('pointermove', onMove,  { passive: true });
-  window.addEventListener('pointerup',   onEnd,   { passive: true });
+  window.addEventListener("pointerdown", onStart, { passive: true });
+  window.addEventListener("pointermove", onMove, { passive: true });
+  window.addEventListener("pointerup", onEnd, { passive: true });
 }
 
 /* =========================================================
@@ -512,7 +557,7 @@ function animateCount(el, target, duration = 1200) {
 }
 
 function initStats() {
-  const stats = document.getElementById('stats');
+  const stats = document.getElementById("stats");
   if (!stats) return;
 
   // Use data-* if present, otherwise the defaults above
@@ -524,9 +569,9 @@ function initStats() {
 
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
 
-  const elP = document.getElementById('countProjects');
-  const elY = document.getElementById('countYears');
-  const elC = document.getElementById('countCerts');
+  const elP = document.getElementById("countProjects");
+  const elY = document.getElementById("countYears");
+  const elC = document.getElementById("countCerts");
 
   const run = () => {
     if (elP) animateCount(elP, cfg.projects);
@@ -534,20 +579,25 @@ function initStats() {
     if (elC) animateCount(elC, cfg.certs);
   };
 
-  const io = new IntersectionObserver((entries, o) => {
-    entries.forEach(en => {
-      if (en.isIntersecting) { run(); o.unobserve(en.target); }
-    });
-  }, { threshold: 0.3 });
+  const io = new IntersectionObserver(
+    (entries, o) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          run();
+          o.unobserve(en.target);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
 
   io.observe(stats);
 }
 
-
 /* =========================================================
-   
+   Init
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   setupNavOutsideClose();
   enableSwipePageNav();
 
@@ -556,5 +606,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 
-  initStats(); // <— add this line
+  initStats();
 });

@@ -7,8 +7,8 @@ const esc = (s) =>
   (s ?? '').toString().replace(/[&<>"']/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-const bodyData = D.body?.dataset || {};
 // Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
+const bodyData = D.body?.dataset || {};
 const API_BASE = (bodyData.api && bodyData.api !== 'off')
   ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, '')
   : '';
@@ -19,7 +19,6 @@ const STATS_DEFAULTS = {
   certs: 12,      // <— change anytime
   startYear: 2024 // <— first year you started (used to compute years)
 };
-
 
 /* =========================================================
    Mobile nav
@@ -76,25 +75,30 @@ function setupNavOutsideClose() {
 const yearEl = $id('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===========================
-// Animated theme switch logic
-// ===========================
+/* =========================================================
+   Animated theme switch (day/night)
+   ========================================================= */
 (function initThemeToggle(){
-  const btn = document.getElementById('themeToggle');
+  const btn = $id('themeToggle');
   if (!btn) return;
 
-  const root = document.documentElement;
+  const root = D.documentElement;
 
   // Default to DAY (light) if nothing saved
   let theme = localStorage.getItem('theme') || 'light';
-  apply(theme);
+  apply(theme, /*initial*/true);
 
-  function apply(t){
+  function apply(t, initial=false){
     const dark = t === 'dark';
     root.setAttribute('data-theme', t);
     btn.classList.toggle('is-dark', dark);
     btn.setAttribute('aria-checked', dark ? 'true' : 'false');
     btn.setAttribute('aria-label', dark ? 'Switch to day mode' : 'Switch to night mode');
+
+    // Avoid jump on first paint; enable animation after the first frame
+    if (initial) {
+      requestAnimationFrame(() => btn.classList.add('enable-anim'));
+    }
   }
 
   function toggle(){
@@ -108,7 +112,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
   });
 })();
-
 
 /* =========================================================
    Active nav item
@@ -221,7 +224,6 @@ async function renderCertificates() {
     grid.innerHTML = html;
   } catch (err) {
     console.error(err);
-    // keep skeleton if you prefer; otherwise show a message:
     grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
   }
 }
@@ -511,21 +513,21 @@ function animateCount(el, target, duration = 1200) {
 }
 
 function initStats() {
-  const stats = document.getElementById('stats');
+  const stats = $id('stats');
   if (!stats) return;
 
-  // Use data-* if present, otherwise the defaults above
+  // Use data-* on #stats or <body>, otherwise the defaults above
   const cfg = {
     projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
     certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
-    startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear),
+    startYear: Number(stats.dataset.startYear || D.body?.dataset?.expStartYear || STATS_DEFAULTS.startYear),
   };
 
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
 
-  const elP = document.getElementById('countProjects');
-  const elY = document.getElementById('countYears');
-  const elC = document.getElementById('countCerts');
+  const elP = $id('countProjects');
+  const elY = $id('countYears');
+  const elC = $id('countCerts');
 
   const run = () => {
     if (elP) animateCount(elP, cfg.projects);
@@ -542,11 +544,10 @@ function initStats() {
   io.observe(stats);
 }
 
-
 /* =========================================================
-   
+   Init
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+D.addEventListener('DOMContentLoaded', () => {
   setupNavOutsideClose();
   enableSwipePageNav();
 
@@ -555,7 +556,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 
-  initStats(); // <— add this line
+  initStats();
 });
-
-

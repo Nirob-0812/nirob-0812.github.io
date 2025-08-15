@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -26,44 +25,44 @@
       </nav>
 
       <!-- Theme toggle OUTSIDE nav so it shows on mobile -->
-<button id="themeToggle"
-        class="theme-switch no-swipe"
-        role="switch"
-        aria-checked="false"
-        aria-label="Switch to night mode">
-  <span class="track">
-    <span class="label night">NIGHT</span>
-    <span class="label day">DAY</span>
-  </span>
+      <button id="themeToggle"
+              class="theme-switch no-swipe"
+              role="switch"
+              aria-checked="false"
+              aria-label="Switch to night mode">
+        <span class="track">
+          <!-- DAY on the left • NIGHT on the right -->
+          <span class="label day">DAY</span>
+          <span class="label night">NIGHT</span>
+        </span>
 
-  <span class="thumb">
-    <!-- Sun -->
-    <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
-      <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="12" y1="2" x2="12" y2="5"/>
-        <line x1="12" y1="19" x2="12" y2="22"/>
-        <line x1="2" y1="12" x2="5"  y2="12"/>
-        <line x1="19" y1="12" x2="22" y2="12"/>
-        <line x1="4.2" y1="4.2" x2="6.4" y2="6.4"/>
-        <line x1="17.6" y1="17.6" x2="19.8" y2="19.8"/>
-        <line x1="17.6" y1="6.4" x2="19.8" y2="4.2"/>
-        <line x1="4.2" y1="19.8" x2="6.4" y2="17.6"/>
-      </g>
-    </svg>
+        <span class="thumb">
+          <!-- Sun -->
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="2"  x2="12" y2="5"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="2"  y1="12" x2="5"  y2="12"/>
+              <line x1="19" y1="12" x2="22" y2="12"/>
+              <line x1="4.2" y1="4.2" x2="6.4" y2="6.4"/>
+              <line x1="17.6" y1="17.6" x2="19.8" y2="19.8"/>
+              <line x1="17.6" y1="6.4"  x2="19.8" y2="4.2"/>
+              <line x1="4.2"  y1="19.8" x2="6.4"  y2="17.6"/>
+            </g>
+          </svg>
 
-    <!-- Moon -->
-    <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M21 12.5A9 9 0 1 1 11.5 3
-               a7 7 0 0 0 9.5 9.5Z"
-            fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linejoin="round" />
-      <circle cx="15.5" cy="8.5" r="1" fill="currentColor"/>
-      <circle cx="18"   cy="10"  r="0.7" fill="currentColor"/>
-    </svg>
-  </span>
-</button>
-
+          <!-- Moon -->
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.5A9 9 0 1 1 11.5 3
+                     a7 7 0 0 0 9.5 9.5Z"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linejoin="round" />
+            <circle cx="15.5" cy="8.5" r="1" fill="currentColor"/>
+            <circle cx="18"   cy="10"  r="0.7" fill="currentColor"/>
+          </svg>
+        </span>
+      </button>
 
       <button class="hamburger" type="button" aria-label="Menu" onclick="toggleNav()">☰</button>
     </div>
@@ -92,22 +91,22 @@
     </section>
 
     <!-- Highlights (counters animate when section enters viewport) -->
-<section id="stats" class="highlights">
-  <div class="highlight-grid">
-    <div class="highlight">
-      <div class="h-num" id="countProjects">0</div>
-      <div class="h-label">Projects</div>
-    </div>
-    <div class="highlight">
-      <div class="h-num" id="countYears">0</div>
-      <div class="h-label">Years Experience</div>
-    </div>
-    <div class="highlight">
-      <div class="h-num" id="countCerts">0</div>
-      <div class="h-label">Certificates</div>
-    </div>
-  </div>
-</section>
+    <section id="stats" class="highlights">
+      <div class="highlight-grid">
+        <div class="highlight">
+          <div class="h-num" id="countProjects">0</div>
+          <div class="h-label">Projects</div>
+        </div>
+        <div class="highlight">
+          <div class="h-num" id="countYears">0</div>
+          <div class="h-label">Years Experience</div>
+        </div>
+        <div class="highlight">
+          <div class="h-num" id="countCerts">0</div>
+          <div class="h-label">Certificates</div>
+        </div>
+      </div>
+    </section>
 
     <!-- Skills -->
     <section class="skills">
@@ -132,7 +131,6 @@
           <div class="skill"><span>PostgreSQL</span><div class="bar"><div class="bar-fill postgres" style="--val:60%"></div></div><div class="pct">60%</div></div>
         </div>
       </div>
-      
     </section>
 
     <!-- Featured -->
@@ -142,7 +140,6 @@
         <!-- JS will render 6 skeletons, fetch, then swap to real cards -->
       </div>
     </section>
-
   </main>
 
   <!-- Footer -->

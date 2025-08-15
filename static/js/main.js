@@ -76,24 +76,39 @@ function setupNavOutsideClose() {
 const yearEl = $id('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-/* =========================================================
-   Theme toggle
-   ========================================================= */
-(function initThemeToggle() {
-  const btn = $id('themeToggle');
+// ===========================
+// Animated theme switch logic
+// ===========================
+(function initThemeToggle(){
+  const btn = document.getElementById('themeToggle');
   if (!btn) return;
 
-  const root = D.documentElement;
-  const saved = localStorage.getItem('theme');
-  if (saved) root.setAttribute('data-theme', saved);
+  const root = document.documentElement;
 
-  btn.addEventListener('click', () => {
-    const curr = root.getAttribute('data-theme') || 'dark';
-    const next = curr === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+  // Default to DAY (light) if nothing saved
+  let theme = localStorage.getItem('theme') || 'light';
+  apply(theme);
+
+  function apply(t){
+    const dark = t === 'dark';
+    root.setAttribute('data-theme', t);
+    btn.classList.toggle('is-dark', dark);
+    btn.setAttribute('aria-checked', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', dark ? 'Switch to day mode' : 'Switch to night mode');
+  }
+
+  function toggle(){
+    theme = (theme === 'dark') ? 'light' : 'dark';
+    localStorage.setItem('theme', theme);
+    apply(theme);
+  }
+
+  btn.addEventListener('click', toggle);
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
   });
 })();
+
 
 /* =========================================================
    Active nav item

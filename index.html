@@ -8,7 +8,7 @@
   <link rel="icon" href="/static/img/mehedi-portrait.jpg"/>
   <script src="/static/js/main.js" defer></script>
 </head>
-<body data-api="off">
+<body data-api="https://portfolio-api-z616.onrender.com">
   <!-- Header -->
   <header class="site-header">
     <div class="container header-grid">
@@ -101,38 +101,15 @@
     </section>
 
     <!-- Featured -->
-    <section class="featured">
-      <div class="featured-head">
-        <h2>Featured</h2>
-        <a class="link-inline" href="/projects.html">See all →</a>
-      </div>
+    <!-- body must include data-api="https://portfolio-api-z616.onrender.com" -->
+<section class="project-section">
+  <h2 class="section-title">Featured work</h2>
+  <div id="featuredGrid" class="project-grid">
+    <!-- (optional) You can place 2–3 static cards here as a fallback.
+         When API is available, they’ll be replaced. -->
+  </div>
+</section>
 
-      <div class="featured-row">
-        <a class="featured-card" href="/projects.html">
-          <h3>FastAPI Portfolio API</h3>
-          <p>Clean, modular API powering contact form and dynamic content.</p>
-          <div class="tags">
-            <span class="tag">FastAPI</span><span class="tag">PostgreSQL</span><span class="tag">Pydantic</span>
-          </div>
-        </a>
-
-        <a class="featured-card" href="/projects.html">
-          <h3>Responsive Portfolio UI</h3>
-          <p>Theme-aware, accessible, and mobile-first interface.</p>
-          <div class="tags">
-            <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">Vanilla JS</span>
-          </div>
-        </a>
-
-        <a class="featured-card" href="/projects.html">
-          <h3>Analytics Dashboard</h3>
-          <p>Simple, fast charts with clean, modern design.</p>
-          <div class="tags">
-            <span class="tag">Python</span><span class="tag">REST</span><span class="tag">Charts</span>
-          </div>
-        </a>
-      </div>
-    </section>
   </main>
 
   <!-- Footer -->

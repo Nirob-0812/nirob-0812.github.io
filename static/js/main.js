@@ -88,18 +88,15 @@ function renderSkeletonGridInto(container, count) {
    Certificates (API + skeleton)
    ========================================================= */
 async function renderCertificates() {
-  const grid = $id('certGrid');
-  if (!grid || !API_BASE) return; // keep static fallback on GH Pages
+  const grid = document.getElementById('certGrid');
+  if (!grid) return;
 
-  // simple card skeletons
-  grid.innerHTML = Array.from({length: 6}).map(() => `
-    <article class="cert-card skeleton-card">
-      <div class="cert-thumb"><div class="skeleton skeleton-thumb"></div></div>
-      <div class="cert-body">
-        <div class="skeleton skeleton-line w-70"></div>
-        <div class="skeleton skeleton-line w-40"></div>
-      </div>
-    </article>`).join('');
+  // If API is disabled (GH Pages only), keep your static fallback
+  if (!API_BASE) return;
+
+  // Show N skeleton cards (responsive, like Featured)
+  const count = Math.max(6, Math.min(12, skeletonCountForViewport()));
+  grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join('');
 
   try {
     const res = await fetch(`${API_BASE}/api/certificates/`, { credentials: 'omit' });
@@ -111,14 +108,17 @@ async function renderCertificates() {
       return;
     }
 
-    grid.innerHTML = items.map(c => `
+    // Prepare final HTML, but don’t inject until images are ready
+    const html = items.map(c => `
       <article class="cert-card">
         <div class="cert-thumb">
           <img src="${esc(c.image)}" alt="${esc(c.title)}">
         </div>
         <div class="cert-body">
           <h3>${esc(c.title)}</h3>
-          <div class="cert-meta">${esc(c.issuer || '')}${c.date ? ' · ' + esc(c.date) : ''}</div>
+          <div class="cert-meta">
+            ${esc(c.issuer || '')}${c.date ? ' · ' + esc(c.date) : ''}
+          </div>
           <div class="cert-actions">
             ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ''}
             <button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button>
@@ -126,6 +126,12 @@ async function renderCertificates() {
         </div>
       </article>
     `).join('');
+
+    // Wait for all images to be loaded/decoded (or timeout)
+    await preloadImages(items.map(i => i.image));
+
+    // Swap skeleton → real cards in one go
+    grid.innerHTML = html;
   } catch (err) {
     console.error(err);
     grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
@@ -256,6 +262,42 @@ async function renderProjects() {
     mount.innerHTML = '<div class="info">Failed to load projects.</div>';
   }
 }
+
+// --- certificate skeleton + image preloader ---
+function certSkeletonCard() {
+  return `
+    <article class="cert-card skeleton-card">
+      <div class="cert-thumb">
+        <div class="skeleton skeleton-thumb"></div>
+      </div>
+      <div class="cert-body">
+        <div class="skeleton skeleton-line w-70"></div>
+        <div class="skeleton skeleton-line w-40"></div>
+        <div class="cert-actions">
+          <span class="btn skeleton-line w-30"></span>
+          <span class="btn ghost skeleton-line w-20"></span>
+        </div>
+      </div>
+    </article>`;
+}
+
+function preloadImages(urls, timeoutMs = 10000) {
+  const waitOne = (url) => new Promise((resolve) => {
+    if (!url) return resolve();
+    const img = new Image();
+    const done = () => resolve();
+    // prefer decode() to avoid flashes
+    img.onload = img.onerror = done;
+    img.src = url;
+    if (img.decode) { img.decode().then(done).catch(done); }
+  });
+
+  const all = Promise.all(urls.map(waitOne));
+  const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
+  // don’t block forever on slow images
+  return Promise.race([all, timer]);
+}
+
 
 /* =========================================================
    Home — Featured (first 6) + skeleton

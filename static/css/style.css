@@ -826,3 +826,55 @@ html[data-theme="light"] .skills .bar{
   background: var(--bg) !important;
   border-color: color-mix(in srgb, var(--bg) 70%, #000 30%) !important;
 }
+
+/* ===== Skeleton Loader ===== */
+:root { --skeleton-bg: rgba(0,0,0,.08); }
+[data-theme="dark"] { --skeleton-bg: rgba(255,255,255,.08); }
+
+.skeleton {
+  position: relative;
+  display: block;
+  background: var(--skeleton-bg);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  animation: sk-shimmer 1.2s infinite;
+}
+@keyframes sk-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-line { height: 12px; margin: 8px 0; }
+.skeleton-thumb { height: 160px; border-radius: 8px; }
+
+.w-40 { width: 40%; }
+.w-60 { width: 60%; }
+.w-70 { width: 70%; }
+.w-90 { width: 90%; }
+
+.skeleton-card { pointer-events: none; }
+
+.skeleton-tag {
+  display: inline-block;
+  height: 22px;
+  width: 64px;
+  border-radius: 999px;
+  margin: 6px 6px 0 0;
+  background: var(--skeleton-bg);
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-tag::after {
+  content: "";
+  position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  animation: sk-shimmer 1.2s infinite;
+}
+

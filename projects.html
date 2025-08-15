@@ -8,7 +8,8 @@
   <link rel="icon" href="/static/img/mehedi-portrait.jpg"/>
   <script src="/static/js/main.js" defer></script>
 </head>
-<body>
+<!-- IMPORTANT: set data-api to your Render URL -->
+<body data-api="https://portfolio-api-z616.onrender.com">
   <header class="site-header">
     <div class="container header-grid">
       <a href="/index.html" class="brand">Mehedi <span>Hasan Nirob</span></a>
@@ -29,33 +30,11 @@
   </header>
 
   <main class="container">
-    <section class="project-section">
-      <h1 class="section-title">Projects</h1>
-
-      <!-- Dynamic grid from API, with static fallback -->
-      <div id="projectGrid" class="project-grid">
-        <!-- Fallback static cards (shown if API fails) -->
-        <a class="project-card" href="#" aria-label="FastAPI Auth Service">
-          <h3>FastAPI Auth Service</h3>
-          <p>JWT auth, email verification, password reset; clean architecture.</p>
-          <div class="tags"><span class="tag">FastAPI</span><span class="tag">JWT</span><span class="tag">PostgreSQL</span></div>
-        </a>
-
-        <a class="project-card" href="#" aria-label="Portfolio Frontend">
-          <h3>Portfolio Frontend</h3>
-          <p>Dark/light theme, mobile drawer, animated hero, accessible modals.</p>
-          <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
-        </a>
-
-        <a class="project-card" href="#" aria-label="Task API">
-          <h3>Task API</h3>
-          <p>CRUD + filtering, pagination, background tasks, tests.</p>
-          <div class="tags"><span class="tag">FastAPI</span><span class="tag">Pytest</span><span class="tag">SQLModel</span></div>
-        </a>
-      </div>
-    </section>
+    <!-- JS will inject sections (DL/CV, ML, Web, …) exactly like localhost -->
+    <div id="projectsApp" class="featured">
+      <div class="info">Loading projects…</div>
+    </div>
   </main>
-
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>

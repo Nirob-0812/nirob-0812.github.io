@@ -536,11 +536,11 @@ html[data-theme="light"] .hero{
 [data-theme="light"] .form button[type="submit"].btn{ box-shadow: 0 2px 10px rgba(0,0,0,.05), inset 0 0 0 1px var(--border); }
 
 /* ===========================
-   Animated Day/Night switch
+   Animated Day/Night switch (compact)
    =========================== */
 .theme-switch{
-  --w: 140px;
-  --h: 42px;
+  --w: 120px;          /* narrower */
+  --h: 36px;           /* shorter */
   --pad: 3px;
   --r: 999px;
   --track: #e9ecef;
@@ -563,7 +563,11 @@ html[data-theme="light"] .hero{
   touch-action: pan-x;
   transition: background .25s ease, border-color .25s ease;
 }
-.theme-switch.enable-anim .thumb{ transition: transform .35s cubic-bezier(.2,.8,.2,1), background .25s ease; }
+
+/* enable motion only after first paint (class added by JS) */
+.theme-switch.enable-anim .thumb{
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), background .25s ease;
+}
 
 [data-theme="dark"] .theme-switch{
   --track: #121418;
@@ -574,14 +578,15 @@ html[data-theme="light"] .hero{
 .theme-switch .track{
   position: absolute; inset: 0;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 14px; pointer-events: none;
-  font: 700 12px/1 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+  padding: 0 12px; pointer-events: none;
+  font: 800 11px/1 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
   letter-spacing: .04em; color: var(--label);
 }
 
-.theme-switch .label{ opacity:.45; transition:opacity .25s ease, transform .25s ease; }
-.theme-switch.is-dark .label.night{ opacity:1; transform:translateY(-1px); }
-.theme-switch:not(.is-dark) .label.day{ opacity:1; transform:translateY(-1px); }
+/* Show only the active label (hide the other completely) */
+.theme-switch .label{ opacity:0; transform: translateY(0); transition: opacity .25s ease; }
+.theme-switch:not(.is-dark) .label.day{   opacity:1; }   /* light mode */
+.theme-switch.is-dark       .label.night{ opacity:1; }   /* dark mode  */
 
 .theme-switch .thumb{
   --d: calc(var(--h) - var(--pad)*2);
@@ -592,10 +597,12 @@ html[data-theme="light"] .hero{
   transform: translateX(calc(var(--w) - var(--d) - var(--pad) - var(--pad)));
   will-change: transform;
 }
+
 .theme-switch.is-dark .thumb{ transform: translateX(0); background:#1c1f26; }
 
+/* smaller, crisper icons */
 .theme-switch .thumb svg{
-  width: 16px; height: 16px; /* smaller, crisper */
+  width: 12px; height: 12px;   /* << smaller icon */
   position: absolute; color: #3a3f4a;
   transition: opacity .28s ease, transform .38s ease;
 }
@@ -611,3 +618,4 @@ html[data-theme="light"] .hero{
 @media (prefers-reduced-motion: reduce){
   .theme-switch, .theme-switch *{ transition:none !important; }
 }
+

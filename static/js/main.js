@@ -1,3 +1,4 @@
+
 /* =========================================================
    Small helpers / config
    ========================================================= */
@@ -7,8 +8,8 @@ const esc = (s) =>
   (s ?? '').toString().replace(/[&<>"']/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-// Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
 const bodyData = D.body?.dataset || {};
+// Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
 const API_BASE = (bodyData.api && bodyData.api !== 'off')
   ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, '')
   : '';
@@ -19,6 +20,7 @@ const STATS_DEFAULTS = {
   certs: 12,      // <— change anytime
   startYear: 2024 // <— first year you started (used to compute years)
 };
+
 
 /* =========================================================
    Mobile nav
@@ -75,30 +77,25 @@ function setupNavOutsideClose() {
 const yearEl = $id('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-/* =========================================================
-   Animated theme switch (day/night)
-   ========================================================= */
+// ===========================
+// Animated theme switch logic
+// ===========================
 (function initThemeToggle(){
-  const btn = $id('themeToggle');
+  const btn = document.getElementById('themeToggle');
   if (!btn) return;
 
-  const root = D.documentElement;
+  const root = document.documentElement;
 
   // Default to DAY (light) if nothing saved
   let theme = localStorage.getItem('theme') || 'light';
-  apply(theme, /*initial*/true);
+  apply(theme);
 
-  function apply(t, initial=false){
+  function apply(t){
     const dark = t === 'dark';
     root.setAttribute('data-theme', t);
     btn.classList.toggle('is-dark', dark);
     btn.setAttribute('aria-checked', dark ? 'true' : 'false');
     btn.setAttribute('aria-label', dark ? 'Switch to day mode' : 'Switch to night mode');
-
-    // Avoid jump on first paint; enable animation after the first frame
-    if (initial) {
-      requestAnimationFrame(() => btn.classList.add('enable-anim'));
-    }
   }
 
   function toggle(){
@@ -112,6 +109,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
   });
 })();
+
 
 /* =========================================================
    Active nav item
@@ -224,6 +222,7 @@ async function renderCertificates() {
     grid.innerHTML = html;
   } catch (err) {
     console.error(err);
+    // keep skeleton if you prefer; otherwise show a message:
     grid.innerHTML = '<div class="info">Sorry, failed to load certificates.</div>';
   }
 }
@@ -513,21 +512,21 @@ function animateCount(el, target, duration = 1200) {
 }
 
 function initStats() {
-  const stats = $id('stats');
+  const stats = document.getElementById('stats');
   if (!stats) return;
 
-  // Use data-* on #stats or <body>, otherwise the defaults above
+  // Use data-* if present, otherwise the defaults above
   const cfg = {
     projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
     certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
-    startYear: Number(stats.dataset.startYear || D.body?.dataset?.expStartYear || STATS_DEFAULTS.startYear),
+    startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear),
   };
 
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
 
-  const elP = $id('countProjects');
-  const elY = $id('countYears');
-  const elC = $id('countCerts');
+  const elP = document.getElementById('countProjects');
+  const elY = document.getElementById('countYears');
+  const elC = document.getElementById('countCerts');
 
   const run = () => {
     if (elP) animateCount(elP, cfg.projects);
@@ -544,10 +543,11 @@ function initStats() {
   io.observe(stats);
 }
 
+
 /* =========================================================
-   Init
+   
    ========================================================= */
-D.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   setupNavOutsideClose();
   enableSwipePageNav();
 
@@ -556,5 +556,5 @@ D.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 
-  initStats();
+  initStats(); // <— add this line
 });

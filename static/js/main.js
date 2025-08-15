@@ -13,6 +13,14 @@ const API_BASE = (bodyData.api && bodyData.api !== 'off')
   ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, '')
   : '';
 
+// Fallback values if you don't provide data-* attributes in HTML
+const STATS_DEFAULTS = {
+  projects: 27,   // <— change anytime
+  certs: 12,      // <— change anytime
+  startYear: 2021 // <— first year you started (used to compute years)
+};
+
+
 /* =========================================================
    Mobile nav
    ========================================================= */
@@ -476,65 +484,47 @@ function enableSwipePageNav() {
    Stats counters (Projects / Years / Certificates)
    ========================================================= */
 function animateCount(el, target, duration = 1200) {
-  if (!el) return;
+  const startVal = 0;
   const start = performance.now();
-  const from = 0;
-  const to = Number(target) || 0;
   function tick(now) {
     const p = Math.min(1, (now - start) / duration);
-    el.textContent = Math.floor(from + (to - from) * p);
+    el.textContent = Math.floor(startVal + (target - startVal) * p);
     if (p < 1) requestAnimationFrame(tick);
-    else el.textContent = String(to);
+    else el.textContent = String(target);
   }
   requestAnimationFrame(tick);
 }
 
-async function updateAndAnimateStats() {
-  const box = document.getElementById('stats');
-  if (!box) return;
+function initStats() {
+  const stats = document.getElementById('stats');
+  if (!stats) return;
 
-  const elProjects = document.getElementById('countProjects');
-  const elYears    = document.getElementById('countYears');
-  const elCerts    = document.getElementById('countCerts');
-
-  // Fallbacks from HTML
-  let projects = parseInt(box.dataset.fallbackProjects || '0', 10);
-  let certs    = parseInt(box.dataset.fallbackCerts || '0', 10);
-  const startY = parseInt(box.dataset.startYear || '2021', 10);
-  let years    = Math.max(1, new Date().getFullYear() - startY);
-
-  // Try API counts
-  if (API_BASE) {
-    try {
-      const [pr, cr] = await Promise.all([
-        fetch(`${API_BASE}/api/projects/`).then(r => r.ok ? r.json() : []),
-        fetch(`${API_BASE}/api/certificates/`).then(r => r.ok ? r.json() : []),
-      ]);
-      if (Array.isArray(pr)) projects = pr.length;
-      if (Array.isArray(cr)) certs    = cr.length;
-    } catch (_) { /* keep fallbacks */ }
-  }
-
-  const run = () => {
-    animateCount(elProjects, projects);
-    animateCount(elYears, years);
-    animateCount(elCerts, certs);
+  // Use data-* if present, otherwise the defaults above
+  const cfg = {
+    projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
+    certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
+    startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear),
   };
 
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          run();
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.25 });
-    io.observe(box);
-  } else {
-    // very old browsers: run immediately
-    run();
-  }
+  const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
+
+  const elP = document.getElementById('countProjects');
+  const elY = document.getElementById('countYears');
+  const elC = document.getElementById('countCerts');
+
+  const run = () => {
+    if (elP) animateCount(elP, cfg.projects);
+    if (elY) animateCount(elY, years);
+    if (elC) animateCount(elC, cfg.certs);
+  };
+
+  const io = new IntersectionObserver((entries, o) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { run(); o.unobserve(en.target); }
+    });
+  }, { threshold: 0.3 });
+
+  io.observe(stats);
 }
 
 
@@ -550,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCertificates();
   setupContactForm();
 
-  updateAndAnimateStats();   // <-- ensure this line exists
+  initStats(); // <— add this line
 });
+
 

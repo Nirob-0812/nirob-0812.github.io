@@ -8,7 +8,7 @@
   <link rel="icon" href="/static/img/mehedi-portrait.jpg"/>
   <script src="/static/js/main.js" defer></script>
 </head>
-<body data-api="on" data-api-base="https://portfolio-api-z616.onrender.com">
+<body data-api="https://portfolio-api-z616.onrender.com">
   <header class="site-header">
     <div class="container header-grid">
       <a href="/index.html" class="brand">Mehedi <span>Hasan Nirob</span></a>
@@ -30,93 +30,8 @@
 
   <main class="container">
     <h1>Certificates</h1>
-    
-    <div id="certGrid" class="cert-grid">
-      <!-- Fallback static cards (kept if API fails) -->
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/Python_basic.png" alt="Python (Basic)">
-        </div>
-        <div class="cert-body">
-          <h3>Python (Basic)</h3>
-          <div class="cert-meta">HackerRank · 2023-03</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/Python_basic.png">View</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/problem_solving_basic.png" alt="Problem Solving (Basic)">
-        </div>
-        <div class="cert-body">
-          <h3>Problem Solving (Basic)</h3>
-          <div class="cert-meta">HackerRank · 2024-05</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/problem_solving_basic.png">View</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/Intro_Tensorflow.png" alt="Intro to TensorFlow">
-        </div>
-        <div class="cert-body">
-          <h3>Intro to TensorFlow</h3>
-          <div class="cert-meta">DeepLearning.AI / Coursera · 2023-11</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/Intro_Tensorflow.png">View</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/NLP.png" alt="Natural Language Processing">
-        </div>
-        <div class="cert-body">
-          <h3>Natural Language Processing</h3>
-          <div class="cert-meta">DeepLearning.AI</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/NLP.png">View</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/ML.png" alt="Machine Learning">
-        </div>
-        <div class="cert-body">
-          <h3>Machine Learning</h3>
-          <div class="cert-meta">Coursera</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/ML.png">View</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="cert-card">
-        <div class="cert-thumb">
-          <img src="/static/img/certificates/CNN.png" alt="Convolutional Neural Networks">
-        </div>
-        <div class="cert-body">
-          <h3>Convolutional Neural Networks</h3>
-          <div class="cert-meta">DeepLearning.AI</div>
-          <div class="cert-actions">
-            <a class="btn verify" href="#" target="_blank" rel="noopener">Verify</a>
-            <button class="btn ghost view" data-cert-view="/static/img/certificates/CNN.png">View</button>
-          </div>
-        </div>
-      </article>
-    </div>
+    <!-- Empty grid: JS renders skeletons, then swaps to API data -->
+    <div id="certGrid" class="cert-grid"></div>
   </main>
 
   <!-- Image Modal (shared) -->

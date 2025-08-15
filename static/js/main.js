@@ -23,6 +23,14 @@ const STATS_DEFAULTS = {
 };
 
 /* =========================================================
+   Optional: auto-clean .../index.html → ...
+   (Safe no-op for already clean URLs)
+   ========================================================= */
+if (/\/index\.html$/.test(location.pathname)) {
+  location.replace(location.pathname.replace(/index\.html$/, ""));
+}
+
+/* =========================================================
    Mobile nav
    ========================================================= */
 function toggleNav() {
@@ -463,6 +471,7 @@ function setupContactForm() {
 
 /* =========================================================
    Tablet swipe navigation (left/right) between pages
+   ——— Updated for clean URLs (no .html)
    ========================================================= */
 function enableSwipePageNav() {
   // Only for tablet-ish widths
@@ -471,15 +480,14 @@ function enableSwipePageNav() {
     return w >= 600 && w <= 1100;
   };
 
-  // Map page order
-  const pages = [
-    "/index.html",
-    "/about.html",
-    "/projects.html",
-    "/resume.html",
-    "/certificates.html",
-  ];
-  const normalize = (p) => (p === "/" ? "/index.html" : p);
+  // Map page order (clean URLs, all with trailing slash)
+  const pages = ["/", "/about/", "/projects/", "/resume/", "/certificates/"];
+
+  // Normalize current path to this format
+  const normalize = (p) => {
+    if (!p || p === "/") return "/";
+    return p.replace(/\/+$/, "") + "/";
+  };
 
   let startX = 0,
     startY = 0,
@@ -517,12 +525,19 @@ function enableSwipePageNav() {
     const THRESH = 80;
     if (Math.abs(dx) > THRESH) {
       tracking = false;
-      const curr =
-        normalize(location.pathname.replace(/\/+$/, "")) || "/index.html";
-      const idx = pages.indexOf(curr);
-      if (idx === -1) return;
-      const targetIdx =
-        dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0);
+
+      // Use clean normalized path
+      const curr = normalize(location.pathname);
+      let idx = pages.indexOf(curr);
+      if (idx === -1) {
+        // Fallback: if someone is on a subpath not in the list, treat as home
+        idx = 0;
+      }
+
+      const targetIdx = dx < 0
+        ? Math.min(idx + 1, pages.length - 1)  // swipe left -> next
+        : Math.max(idx - 1, 0);                // swipe right -> prev
+
       if (targetIdx !== idx) location.href = pages[targetIdx];
     }
   }

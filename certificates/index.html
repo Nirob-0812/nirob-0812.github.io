@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Contact — Mehedi Hasan Nirob</title>
+  <title>Certificates — Mehedi Hasan Nirob</title>
   <link rel="stylesheet" href="/static/css/style.css"/>
   <link rel="icon" href="/static/img/mhn-favicon.svg" type="image/svg+xml">
   <script src="/static/js/main.js" defer></script>
 </head>
-<!-- IMPORTANT: set data-api to your Render URL -->
 <body data-api="https://portfolio-api-z616.onrender.com">
   <header class="site-header">
     <div class="container header-grid">
-      <a href="/index.html" class="brand">Mehedi <span>Hasan Nirob</span></a>
+      <a href="/" class="brand">Mehedi <span>Hasan Nirob</span></a>
       <nav id="nav" class="nav">
-        <a href="/index.html">Home</a>
-        <a href="/about.html">About</a>
-        <a href="/projects.html">Projects</a>
-        <a href="/resume.html">Resume</a>
-        <a href="/certificates.html">Certificates</a>
-        <a class="btn" href="/contact.html">Contact</a>
-      </nav>
+  <a href="/">Home</a>
+  <a href="/about/">About</a>
+  <a href="/projects/">Projects</a>
+  <a href="/resume/">Resume</a>
+  <a href="/certificates/">Certificates</a>
+  <a class="btn" href="/contact/">Contact</a>
+</nav>
+
 <!-- Theme toggle OUTSIDE nav so it shows on mobile -->
       <button id="themeToggle"
               class="theme-switch no-swipe"
@@ -65,32 +65,21 @@
   </header>
 
   <main class="container">
-    <h1>Contact</h1>
-
-    <!-- Fallback action points to Formspree; JS will intercept and send to FastAPI when API_BASE is set -->
-    <form id="contactForm" class="form" action="https://formspree.io/f/xbldneoy" method="POST">
-      <p id="contactOk" class="alert success" hidden>Thanks! Your message has been sent.</p>
-      <p id="contactErr" class="alert" hidden>Sorry — something went wrong. Please try again.</p>
-
-      <label>Name
-        <input type="text" name="name" placeholder="Your name" required />
-      </label>
-      
-      <label>Email
-        <input type="email" name="email" placeholder="you@example.com" required />
-      </label>
-      
-      <label>Subject
-        <input type="text" name="subject" placeholder="What’s this about?" required />
-      </label>
-      
-      <label>Message
-        <textarea name="message" rows="7" placeholder="Tell me a bit about your project…" required></textarea>
-      </label>
-
-      <button class="btn" type="submit">Send</button>
-    </form>
+    <h1>Certificates</h1>
+    <!-- Empty grid: JS renders skeletons, then swaps to API data -->
+    <div id="certGrid" class="cert-grid"></div>
   </main>
+
+  <!-- Image Modal (shared) -->
+  <div id="certModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal modal-image">
+      <img id="certImg" alt="Certificate preview"/>
+      <div class="modal-actions">
+        <button class="btn modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>

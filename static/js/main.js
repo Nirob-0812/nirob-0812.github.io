@@ -114,7 +114,7 @@ function setAndAnimateCount(selector, value) {
   animateCount(el, value);
 }
 async function loadAndAnimateStats() {
-  const startYear = parseInt(document.body.dataset.expStartYear || '2021', 10);
+  const startYear = parseInt(document.body.dataset.expStartYear || '2024', 10);
   const years = Math.max(1, (new Date()).getFullYear() - startYear);
 
   if (!API_BASE) { setAndAnimateCount('#countYears', years); return; }

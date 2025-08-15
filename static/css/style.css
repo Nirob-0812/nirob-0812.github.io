@@ -926,5 +926,56 @@ html[data-theme="light"] .skills .bar{
   --skeleton-highlight: rgba(255,255,255,.12);
 }
 
+/* --- Footer: always centered, all breakpoints --- */
+.site-footer {
+  padding: 1.5rem 0;
+}
 
+.site-footer .footer-grid {
+  /* force a vertical stack: text on top, icons below */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.9rem;
+}
+
+/* icon row */
+.site-footer .socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;                /* wrap nicely on small screens */
+  margin: 0;                      /* reset any old spacing */
+  padding: 0;
+}
+
+/* individual circular icon buttons */
+.site-footer .socials a {
+  width: 42px;
+  height: 42px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--panel, rgba(255,255,255,0.12));
+  box-shadow: 0 0 0 1px var(--border, rgba(0,0,0,.12)) inset;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.site-footer .socials a:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--accent, #7f5af0) inset,
+    0 6px 16px rgba(0,0,0,.15);
+}
+
+/* make sure the SVGs are centered and inherit color */
+.site-footer .socials a svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  opacity: .9;
+}
 

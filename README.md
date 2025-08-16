@@ -29,17 +29,26 @@ This repository contains the **static frontend** for my personal portfolio. It�
 
 ```
 /
-├─ index.html           # Home
-├─ about.html
-├─ projects.html
-├─ resume.html
-├─ certificates.html
-├─ contact.html
+├─ index.html                # Home
+├─ about/
+│  └─ index.html             # About page
+├─ certificates/
+│  └─ index.html             # Certificates page
+├─ contact/
+│  └─ index.html             # Contact page
+├─ projects/
+│  └─ index.html             # Projects page
+├─ resume/
+│  └─ index.html             # Resume page
 ├─ static/
-│  ├─ css/style.css
-│  ├─ js/main.js
-│  └─ img/… (portrait, favicon, etc.)
+│  ├─ css/
+│  │  └─ style.css           # Stylesheet
+│  ├─ js/
+│  │  └─ main.js             # JavaScript
+│  └─ img/…                  # Images (portrait, favicon, etc.)
+├─ LICENSE
 └─ README.md
+
 ```
 
 ---

@@ -120,9 +120,10 @@ This repo is named **`nirob-0812.github.io`** so GitHub Pages serves it automati
 ## 👤 Author
 
 **Mehedi Hasan Nirob**  
-- GitHub: https://github.com/Nirob-0812  
-- X (Twitter): https://x.com/mhnirob0812  
-- Email: mehedihasannirobcsediu@gmail.com
+
+- [GitHub](https://github.com/Nirob-0812)  
+- [X (Twitter)](https://x.com/mhnirob0812)  
+- [Email](mailto:mehedihasannirobcsediu@gmail.com)  
 
 ---
 

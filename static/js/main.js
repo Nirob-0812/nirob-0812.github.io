@@ -296,6 +296,7 @@ async function renderCertificates() {
    Projects page — skeleton like Featured (no headers while loading)
    ========================================================= */
 const CATEGORY_TITLES = {
+  deployed: "Deployed Projects",
   dl: "Deep Learning / CV",
   ml: "Machine Learning",
   web: "Web",
@@ -305,7 +306,7 @@ const CATEGORY_TITLES = {
   notebook: "Notebooks / Study",
   other: "Other",
 };
-const CATEGORY_ORDER = ["dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
+const CATEGORY_ORDER = ["deployed","dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
 function getTechs(p) {
   return p.techs || p.tech || p.tags || p.stack || [];
 }

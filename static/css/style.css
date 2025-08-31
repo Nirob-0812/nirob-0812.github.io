@@ -985,7 +985,7 @@ html[data-theme="light"] .skills .bar{
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: .35rem;
   margin-top: .5rem;
 }
 
@@ -993,8 +993,8 @@ html[data-theme="light"] .skills .bar{
 .site-footer .socials a,
 .site-footer .socials a:link,
 .site-footer .socials a:visited {
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -1013,8 +1013,8 @@ html[data-theme="light"] .skills .bar{
 }
 
 .site-footer .socials a svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;  /* follow the 'color' above */
   stroke: none;
   pointer-events: none;

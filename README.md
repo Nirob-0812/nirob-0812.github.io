@@ -2,7 +2,7 @@
 # Mehedi Hasan Nirob – Portfolio (Frontend)
 
 Live site → **https://nirob-0812.github.io**  
-API (production) → **https://portfolio-api-z616.onrender.com**
+API (production) → **https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api**
 
 This repository contains the **static frontend** for my personal portfolio. It’s a fast, no‑framework site powered by modern CSS and a tiny bit of vanilla JS. The UI fetches projects and certificates from the companion API and includes a polished light/dark theme toggle, animated counters, skeleton loaders, and a mobile‑first navigation.
 
@@ -76,7 +76,7 @@ Open the folder in VS Code ⇒ right‑click `index.html` ⇒ “Open with Live 
 
 The frontend reads an API base URL from the `<body>` attribute:
 ```html
-<body data-api="https://portfolio-api-z616.onrender.com">
+<body data-api="https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api">
 ```
 If you want to point to a **local API** while developing:
 

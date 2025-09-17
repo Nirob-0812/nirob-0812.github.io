@@ -14,7 +14,7 @@ const STATS_DEFAULTS = {
   startYear: 2024
 };
 
-// NOTE: PROJECTS and CERTIFICATES data arrays have been completely REMOVED from this file.
+// NOTE: PROJECTS and CERTIFICATES data arrays are NOT in this file.
 
 /* =========================================================
    Optional: auto-clean .../index.html → ...
@@ -24,7 +24,7 @@ if (/\/index\.html$/.test(location.pathname)) {
 }
 
 /* =========================================================
-   Mobile nav
+   Mobile nav and other functions...
    ========================================================= */
 function toggleNav() {
   const nav = $id("nav");
@@ -43,9 +43,7 @@ function setupNavOutsideClose() {
   const nav = $id("nav");
   const btn = D.querySelector(".hamburger");
   if (!nav || !btn) return;
-
   const isOutside = (t) => !nav.contains(t) && !btn.contains(t);
-
   const onAnyPointer = (e) => {
     if (!nav.classList.contains("open")) return;
     const target = e.target;
@@ -54,17 +52,14 @@ function setupNavOutsideClose() {
       btn.setAttribute("aria-expanded", "false");
     }
   };
-
   D.addEventListener("click", onAnyPointer, { capture: true });
   D.addEventListener("touchstart", onAnyPointer, { passive: true, capture: true });
-
   D.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && nav.classList.contains("open")) {
       nav.classList.remove("open");
       btn.setAttribute("aria-expanded", "false");
     }
   });
-
   nav.addEventListener("click", (e) => {
     if (e.target.closest("a")) {
       nav.classList.remove("open");
@@ -73,24 +68,16 @@ function setupNavOutsideClose() {
   });
 }
 
-/* =========================================================
-   Footer year
-   ========================================================= */
 const yearEl = $id("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-/* =========================================================
-   Animated theme switch logic
-   ========================================================= */
 (function initThemeToggle() {
   const btn = $id("themeToggle");
   if (!btn) return;
-
   const root = document.documentElement;
   let theme = localStorage.getItem("theme") || "light";
   apply(theme);
   requestAnimationFrame(() => btn.classList.add("enable-anim"));
-
   function apply(t) {
     const dark = t === "dark";
     root.setAttribute("data-theme", t);
@@ -98,13 +85,11 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     btn.setAttribute("aria-checked", dark ? "true" : "false");
     btn.setAttribute("aria-label", dark ? "Switch to day mode" : "Switch to night mode");
   }
-
   function toggle() {
     theme = theme === "dark" ? "light" : "dark";
     localStorage.setItem("theme", theme);
     apply(theme);
   }
-
   btn.addEventListener("click", toggle);
   btn.addEventListener("keydown", (e) => {
     if (e.key === " " || e.key === "Enter") {
@@ -114,9 +99,6 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   });
 })();
 
-/* =========================================================
-   Active nav item
-   ========================================================= */
 (function setActiveNav() {
   const path = location.pathname.replace(/\/+$/, "") || "/";
   D.querySelectorAll(".nav a[href]").forEach((a) => {
@@ -127,134 +109,35 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   });
 })();
 
-/* =========================================================
-   Skeleton helpers (match Featured style)
-   ========================================================= */
-function skeletonCard() {
-  return `
-    <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
-      <div class="skeleton skeleton-line w-60"></div>
-      <div class="skeleton skeleton-line w-90"></div>
-      <div class="tags">
-        <span class="tag skeleton-tag"></span>
-        <span class="tag skeleton-tag"></span>
-        <span class="tag skeleton-tag"></span>
-      </div>
-    </a>`;
-}
-function skeletonCountForViewport() {
-  const w = window.innerWidth || D.documentElement.clientWidth || 1024;
-  if (w < 480) return 4;
-  if (w < 768) return 6;
-  if (w < 1024) return 8;
-  if (w < 1440) return 12;
-  return 16;
-}
-function renderSkeletonGridInto(container, count) {
-  container.innerHTML = `<div class="project-grid">${Array.from({ length: count })
-    .map(skeletonCard)
-    .join("")}</div>`;
-}
-
-/* =========================================================
-   Certificates (API + skeleton)
-   ========================================================= */
-function certSkeletonCard() {
-  return `
-    <article class="cert-card skeleton-card">
-      <div class="cert-thumb">
-        <div class="skeleton skeleton-thumb"></div>
-      </div>
-      <div class="cert-body">
-        <div class="skeleton skeleton-line w-70"></div>
-        <div class="skeleton skeleton-line w-40"></div>
-        <div class="cert-actions">
-          <span class="btn skeleton-line w-30"></span>
-          <span class="btn ghost skeleton-line w-20"></span>
-        </div>
-      </div>
-    </article>`;
-}
-
-function preloadImages(urls, timeoutMs = 10000) {
-  const waitOne = (url) =>
-    new Promise((resolve) => {
-      if (!url) return resolve();
-      const img = new Image();
-      const done = () => resolve();
-      img.onload = img.onerror = done;
-      img.src = url;
-      if (img.decode) {
-        img.decode().then(done).catch(done);
-      }
-    });
-
-  const all = Promise.all(urls.map(waitOne));
-  const timer = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-  return Promise.race([all, timer]);
-}
-
-/* =========================================================
-   UPDATED: Certificates function (Safe Version)
-   ========================================================= */
 function renderCertificates() {
   const grid = $id("certGrid");
-  if (!grid) return; // Exit if not on the certificates page
-
-  // Safely check if the CERTIFICATES variable was defined on the current page
-  if (typeof CERTIFICATES === 'undefined' || !CERTIFICATES.length) {
-    return;
-  }
-
-  const items = CERTIFICATES;
-  const html = items
-    .map(
-      (c) => `
+  if (!grid) return;
+  if (typeof CERTIFICATES === 'undefined' || !CERTIFICATES.length) return;
+  const html = CERTIFICATES.map(c => `
     <article class="cert-card">
-      <div class="cert-thumb">
-        <a href="${esc(c.verify_url)}" target="_blank" rel="noopener">
-          <img src="${esc(c.image)}" alt="${esc(c.title)}">
-        </a>
+      <div class="cert-thumb"><a href="${esc(c.verify_url)}" target="_blank" rel="noopener"><img src="${esc(c.image)}" alt="${esc(c.title)}"></a></div>
+      <div class="cert-body"><h3>${esc(c.title)}</h3><div class="cert-meta">${esc(c.issuer||"")}${c.date?" · "+esc(c.date):""}</div>
+        <div class="cert-actions">${c.verify_url?`<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>`:""}<button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button></div>
       </div>
-      <div class="cert-body">
-        <h3>${esc(c.title)}</h3>
-        <div class="cert-meta">
-          ${esc(c.issuer || "")}${c.date ? " · " + esc(c.date) : ""}
-        </div>
-        <div class="cert-actions">
-          ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ""}
-          <button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button>
-        </div>
-      </div>
-    </article>
-  `
-    )
-    .join("");
-
+    </article>`).join("");
   grid.innerHTML = html;
 }
 
-/* =========================================================
-   Certificate Modal
-   ========================================================= */
 (function setupCertModal() {
   const modal = $id("certModal");
   const imgEl = $id("certImg");
   if (!modal || !imgEl) return;
-
   D.addEventListener("click", (e) => {
     const trigger = e.target.closest("[data-cert-view]");
     if (!trigger) return;
     e.preventDefault();
     const src = trigger.getAttribute("data-cert-view");
     if (!src) return;
-
     imgEl.src = src;
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     D.body.classList.add("no-scroll");
   });
-
   modal.addEventListener("click", (e) => {
     if (e.target === modal || e.target.classList.contains("modal-close")) {
       imgEl.src = "";
@@ -263,7 +146,6 @@ function renderCertificates() {
       D.body.classList.remove("no-scroll");
     }
   });
-
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal.classList.contains("open")) {
       imgEl.src = "";
@@ -274,194 +156,111 @@ function renderCertificates() {
   });
 })();
 
-/* =========================================================
-   UPDATED: Projects page function (Safe Version)
-   ========================================================= */
-const CATEGORY_TITLES = {
-  deployed: "Deployed Projects",
-  dl: "Deep Learning / CV",
-  ml: "Machine Learning",
-  web: "Web",
-  app: "Apps (Flutter)",
-  algo: "Programming & Algorithms",
-  robotics: "Robotics",
-  notebook: "Notebooks / Study",
-  other: "Other",
-};
+const CATEGORY_TITLES = { deployed: "Deployed Projects", dl: "Deep Learning / CV", ml: "Machine Learning", web: "Web", app: "Apps (Flutter)", algo: "Programming & Algorithms", robotics: "Robotics", notebook: "Notebooks / Study", other: "Other" };
 const CATEGORY_ORDER = ["deployed", "dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
-function getTechs(p) {
-  return p.techs || p.tech || p.tags || p.stack || [];
-}
+function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
 
 function renderProjects() {
   const mount = $id("projectsApp");
-  if (!mount) return; // Exit if not on the projects page
-
-  // Safely check if the PROJECTS variable was defined on the current page
-  if (typeof PROJECTS === 'undefined' || !PROJECTS.length) {
-    return;
-  }
-
+  if (!mount) return;
+  if (typeof PROJECTS === 'undefined' || !PROJECTS.length) return;
   const items = PROJECTS;
   const grouped = {};
-  for (const p of items) (grouped[p.category || "other"] ||= []).push(p);
-
+  for (const p of items)(grouped[p.category || "other"] ||= []).push(p);
   let html = "";
   for (const key of CATEGORY_ORDER) {
     const list = grouped[key];
     if (!list || !list.length) continue;
-
-    html += `<section class="project-section">
-      <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
-      <div class="project-grid">`;
-
+    html += `<section class="project-section"><h2 class="section-title">${esc(CATEGORY_TITLES[key]||key)}</h2><div class="project-grid">`;
     for (const p of list) {
       const techs = getTechs(p);
       const href = p.url || p.href || "#";
       const desc = p.summary || p.desc || p.description || "";
-      html += `
-        <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(desc)}</p>
-          <div class="tags">
-            ${(Array.isArray(techs) ? techs : [])
-              .map((t) => `<span class="tag">${esc(t)}</span>`)
-              .join("")}
-          </div>
-        </a>`;
+      html += `<a class="project-card" href="${esc(href)}" target="_blank" rel="noopener"><h3>${esc(p.title)}</h3><p>${esc(desc)}</p><div class="tags">${(Array.isArray(techs)?techs:[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div></a>`;
     }
     html += `</div></section>`;
   }
   mount.innerHTML = html || '<div class="info">No projects available.</div>';
 }
 
-/* =========================================================
-   UPDATED: Home — Featured projects function (Safe Version)
-   ========================================================= */
 function renderFeatured() {
   const grid = $id("featuredGrid");
-  if (!grid) return; // Exit if not on the home page
-
-  // Safely check if the PROJECTS variable was defined on the current page
-  if (typeof PROJECTS === 'undefined' || !PROJECTS.length) {
-    return;
-  }
-
+  if (!grid) return;
+  if (typeof PROJECTS === 'undefined' || !PROJECTS.length) return;
   const featured = PROJECTS.slice(0, 6);
-  grid.innerHTML = featured
-    .map((p) => {
-      const href = p.url || p.href || "#";
-      const desc = p.summary || p.desc || p.description || "";
-      const techs = getTechs(p);
-      return `
-      <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
-        <h3>${esc(p.title)}</h3>
-        <p>${esc(desc)}</p>
-        <div class="tags">
-          ${(Array.isArray(techs) ? techs : [])
-            .map((t) => `<span class="tag">${esc(t)}</span>`)
-            .join("")}
-        </div>
-      </a>`;
-    })
-    .join("");
+  grid.innerHTML = featured.map(p => {
+    const href = p.url || p.href || "#";
+    const desc = p.summary || p.desc || p.description || "";
+    const techs = getTechs(p);
+    return `<a class="project-card" href="${esc(href)}" target="_blank" rel="noopener"><h3>${esc(p.title)}</h3><p>${esc(desc)}</p><div class="tags">${(Array.isArray(techs)?techs:[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div></a>`;
+  }).join("");
 }
 
 /* =========================================================
-   Contact Form
+   UPDATED: Contact Form now submits with JavaScript
    ========================================================= */
 function setupContactForm() {
-  const form = $id("contactForm");
-  if (!form) return;
-
-  const btn = form.querySelector('button[type="submit"]');
-  const okEl = $id("contactOk");
-  const errEl = $id("contactErr");
-
-  if (!API_BASE) return; // This will now always be true, so the function won't run.
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    okEl && (okEl.hidden = true);
-    errEl && (errEl.hidden = true);
-    btn && (btn.disabled = true);
-
-    const payload = {
-      name: form.name.value.trim(),
-      email: form.email.value.trim(),
-      subject: form.subject.value.trim(),
-      message: form.message.value.trim(),
-    };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/contact/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      form.reset();
-      okEl && (okEl.hidden = false);
-    } catch (err) {
-      console.error(err);
-      errEl && (errEl.hidden = false);
-    } finally {
-      btn && (btn.disabled = false);
+    const form = $id("contactForm");
+    
+    // Diagnostic test to make sure this function finds the form
+    if (!form) {
+        console.log("DEBUG: Contact form with id='contactForm' was NOT found on this page.");
+        return;
     }
-  });
+    console.log("DEBUG: Contact form script is running and has found the form!");
+
+    const btn = form.querySelector('button[type="submit"]');
+    const okEl = $id("contactOk");
+    const errEl = $id("contactErr");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // This is the line that stops the redirect.
+
+        okEl && (okEl.hidden = true);
+        errEl && (errEl.hidden = true);
+        btn && (btn.disabled = true);
+
+        const formData = new FormData(form);
+
+        try {
+            // Get the URL from the form's "action" attribute
+            const formspreeURL = form.getAttribute("action");
+
+            const response = await fetch(formspreeURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                form.reset();
+                okEl && (okEl.hidden = false);
+            } else {
+                const data = await response.json();
+                console.error('Formspree returned an error:', data);
+                errEl && (errEl.hidden = false);
+            }
+        } catch (error) {
+            console.error('Network error during form submission:', error);
+            errEl && (errEl.hidden = false);
+        } finally {
+            btn && (btn.disabled = false);
+        }
+    });
 }
 
-/* =========================================================
-   Tablet swipe navigation
-   ========================================================= */
+
 function enableSwipePageNav() {
-  const isTabletWidth = () => {
-    const w = window.innerWidth || D.documentElement.clientWidth || 1024;
-    return w >= 600 && w <= 1100;
-  };
+  const isTabletWidth = () => { const w = window.innerWidth || D.documentElement.clientWidth || 1024; return w >= 600 && w <= 1100; };
   const pages = ["/", "/about/", "/projects/", "/resume/", "/certificates/"];
-  const normalize = (p) => {
-    if (!p || p === "/") return "/";
-    return p.replace(/\/+$/, "") + "/";
-  };
+  const normalize = (p) => { if (!p || p === "/") return "/"; return p.replace(/\/+$/, "") + "/"; };
   let startX = 0, startY = 0, tracking = false;
   const ignoreTarget = (t) => !!t.closest("a, button, input, textarea, select, label, .no-swipe, .nav");
-
-  function onStart(e) {
-    if (!isTabletWidth()) return;
-    const t = (e.touches && e.touches[0]) || e;
-    if (!t || ignoreTarget(e.target)) return;
-    const nav = $id("nav");
-    if (nav && nav.classList.contains("open")) return;
-    tracking = true;
-    startX = t.clientX;
-    startY = t.clientY;
-  }
-  function onMove(e) {
-    if (!tracking) return;
-    const t = (e.touches && e.touches[0]) || e;
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-    if (Math.abs(dy) > 60) {
-      tracking = false;
-      return;
-    }
-    const THRESH = 80;
-    if (Math.abs(dx) > THRESH) {
-      tracking = false;
-      const curr = normalize(location.pathname);
-      let idx = pages.indexOf(curr);
-      if (idx === -1) {
-        idx = 0;
-      }
-      const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0);
-      if (targetIdx !== idx) location.href = pages[targetIdx];
-    }
-  }
-  function onEnd() {
-    tracking = false;
-  }
-
+  function onStart(e) { if (!isTabletWidth()) return; const t = (e.touches && e.touches[0]) || e; if (!t || ignoreTarget(e.target)) return; const nav = $id("nav"); if (nav && nav.classList.contains("open")) return; tracking = true; startX = t.clientX; startY = t.clientY; }
+  function onMove(e) { if (!tracking) return; const t = (e.touches && e.touches[0]) || e; const dx = t.clientX - startX; const dy = t.clientY - startY; if (Math.abs(dy) > 60) { tracking = false; return; } if (Math.abs(dx) > 80) { tracking = false; const curr = normalize(location.pathname); let idx = pages.indexOf(curr); if (idx === -1) idx = 0; const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0); if (targetIdx !== idx) location.href = pages[targetIdx]; } }
+  function onEnd() { tracking = false; }
   window.addEventListener("touchstart", onStart, { passive: true });
   window.addEventListener("touchmove", onMove, { passive: true });
   window.addEventListener("touchend", onEnd, { passive: true });
@@ -470,9 +269,6 @@ function enableSwipePageNav() {
   window.addEventListener("pointerup", onEnd, { passive: true });
 }
 
-/* =========================================================
-   Stats counters
-   ========================================================= */
 function animateCount(el, target, duration = 1200) {
   const startVal = 0;
   const start = performance.now();
@@ -488,35 +284,13 @@ function animateCount(el, target, duration = 1200) {
 function initStats() {
   const stats = document.getElementById("stats");
   if (!stats) return;
-
-  const cfg = {
-    projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
-    certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
-    startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear),
-  };
-
+  const cfg = { projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects), certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs), startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear), };
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
   const elP = document.getElementById("countProjects");
   const elY = document.getElementById("countYears");
   const elC = document.getElementById("countCerts");
-
-  const run = () => {
-    if (elP) animateCount(elP, cfg.projects);
-    if (elY) animateCount(elY, years);
-    if (elC) animateCount(elC, cfg.certs);
-  };
-
-  const io = new IntersectionObserver(
-    (entries, o) => {
-      entries.forEach((en) => {
-        if (en.isIntersecting) {
-          run();
-          o.unobserve(en.target);
-        }
-      });
-    },
-    { threshold: 0.3 }
-  );
+  const run = () => { if (elP) animateCount(elP, cfg.projects); if (elY) animateCount(elY, years); if (elC) animateCount(elC, cfg.certs); };
+  const io = new IntersectionObserver((entries, o) => { entries.forEach((en) => { if (en.isIntersecting) { run(); o.unobserve(en.target); } }); }, { threshold: 0.3 });
   io.observe(stats);
 }
 
@@ -526,11 +300,9 @@ function initStats() {
 document.addEventListener("DOMContentLoaded", () => {
   setupNavOutsideClose();
   enableSwipePageNav();
-
   renderFeatured();
   renderProjects();
   renderCertificates();
   setupContactForm();
-
   initStats();
 });

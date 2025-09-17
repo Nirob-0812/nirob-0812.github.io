@@ -67,35 +67,31 @@
 
   <main class="container">
     <h1>Contact</h1>
-    <p class="subtitle">Have a question or want to work together? Leave a message.</p>
 
-    <form 
-      id="contactForm" 
-      class="contact-form" 
-      action="https://formspree.io/f/mnnbkzwa" method="POST"
-    >
-        <div class="form-group">
-            <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Your Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" id="subject" name="subject" required>
-        </div>
-        <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" rows="6" required></textarea>
-        </div>
-        <button type="submit" class="btn">Send Message</button>
+    <!-- Fallback action points to Formspree; JS will intercept and send to FastAPI when API_BASE is set -->
+    <form id="contactForm" class="form" action="https://formspree.io/f/mnnbkzwa" method="POST">
+      <p id="contactOk" class="alert success" hidden>Thanks! Your message has been sent.</p>
+      <p id="contactErr" class="alert" hidden>Sorry — something went wrong. Please try again.</p>
+
+      <label>Name
+        <input type="text" name="name" placeholder="Your name" required />
+      </label>
+      
+      <label>Email
+        <input type="email" name="email" placeholder="you@example.com" required />
+      </label>
+      
+      <label>Subject
+        <input type="text" name="subject" placeholder="What’s this about?" required />
+      </label>
+      
+      <label>Message
+        <textarea name="message" rows="7" placeholder="Tell me a bit about your project…" required></textarea>
+      </label>
+
+      <button class="btn" type="submit">Send</button>
     </form>
-    
-    <div id="contactOk" class="info" hidden>Your message has been sent successfully!</div>
-    <div id="contactErr" class="info error" hidden>Sorry, there was an error sending your message.</div>
-</main>
+  </main>
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="copyright">© <span id="year"></span> Mehedi Hasan Nirob</div>

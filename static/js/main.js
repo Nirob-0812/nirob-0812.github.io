@@ -1,3 +1,221 @@
+const PROJECTS = [
+   
+    //----------Deployed projects-------------
+    {
+        "title": "AI Assistant Platform (API + UI)",
+        "description": "FastAPI backend with static JS UI for Q&A, images, and content.",
+        "tech": ["Python", "FastAPI", "MCP", "LLM (Gemini/HF)"],
+        "url": "https://nirob-0812.github.io/ai-task-ui/",
+        "category": "deployed"
+    },
+    // -------- Deep Learning / CV ----------
+    {
+        "title": "Violence Detection",
+        "description": "Deep-learning pipeline to detect violence in video frames.",
+        "tech": ["Python", "PyTorch/TensorFlow", "OpenCV"],
+        "url": "https://github.com/Nirob-0812/Violence-Detection",
+        "category": "dl",
+    },
+    {
+        "title": "Object Detection using YOLO",
+        "description": "YOLOv8-based object detection with pre-trained weights and sample inference.",
+        "tech": ["Python", "Ultralytics YOLOv8", "OpenCV"],
+        "url": "https://github.com/Nirob-0812/Object_Detection_Yolo",
+        "category": "dl",
+    },
+    {
+        "title": "Handwritten Digit Classification (Keras)",
+        "description": "Neural net for digit recognition; training loops and accuracy curves.",
+        "tech": ["Python", "TensorFlow/Keras", "NumPy"],
+        "url": "https://github.com/Nirob-0812/DL_Exercise/tree/master/Hand_Digit_Classification",
+        "category": "dl",
+    },
+    {
+        "title": "Activation Functions (DL)",
+        "description": "Activation functions explained with plots and code.",
+        "tech": ["Python", "NumPy", "Matplotlib"],
+        "url": "https://github.com/Nirob-0812/DL_Exercise/tree/master/Activation_Function",
+        "category": "dl",
+    },
+
+    // --------------- Machine Learning ---------------
+    {
+        "title": "ML Exercises",
+        "description": "Hands-on ML exercises: regression, classification, model evaluation.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise",
+        "category": "ml",
+    },
+    {
+        "title": "Decision Tree (Exercises)",
+        "description": "Decision-tree classification/regression with feature importance.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/Decision_tree_exercise",
+        "category": "ml",
+    },
+    {
+        "title": "Iris Flower Classification",
+        "description": "Classic multi-class classification with visualizations.",
+        "tech": ["Python", "scikit-learn", "Seaborn"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/Iris_flower_classification",
+        "category": "ml",
+    },
+    {
+        "title": "Random Forest (Exercises)",
+        "description": "Ensemble modeling experiments and hyper-parameter tuning.",
+        "tech": ["Python", "scikit-learn"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/Random_forest_exercsie",
+        "category": "ml",
+    },
+    {
+        "title": "SVM (Exercises)",
+        "description": "Support Vector Machine experiments across kernels and C/γ sweeps.",
+        "tech": ["Python", "scikit-learn", "NumPy"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/SVM_Exercise",
+        "category": "ml",
+    },
+    {
+        "title": "House Price Prediction (Multivariate)",
+        "description": "Multiple linear regression with preprocessing and error analysis.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/House_price_Multivariate",
+        "category": "ml",
+    },
+    {
+        "title": "Insurance Cost Prediction",
+        "description": "Predicting medical insurance charges with regression baselines.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/Insurance_Prediction",
+        "category": "ml",
+    },
+
+    // --------------- ML Projects (problem sets) ---------------
+    {
+        "title": "Diabetes Prediction",
+        "description": "End-to-end classification pipeline from the medical dataset.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML-Project/tree/master/Diabates%20Prediction",
+        "category": "ml",
+    },
+    {
+        "title": "Heart Disease Prediction",
+        "description": "Cardio-risk classifier with model comparison & metrics.",
+        "tech": ["Python", "scikit-learn", "Matplotlib"],
+        "url": "https://github.com/Nirob-0812/ML-Project/tree/master/Heart%20Disease%20Prediction",
+        "category": "ml",
+    },
+    {
+        "title": "Loan Status Prediction",
+        "description": "Credit risk classification with feature encoding & validation.",
+        "tech": ["Python", "scikit-learn", "Pandas"],
+        "url": "https://github.com/Nirob-0812/ML-Project/tree/master/Loan%20Status%20Prediction",
+        "category": "ml",
+    },
+    {
+        "title": "Spam Mail Prediction",
+        "description": "Email spam classifier; text preprocessing and logistic regression.",
+        "tech": ["Python", "scikit-learn", "NLTK"],
+        "url": "https://github.com/Nirob-0812/ML-Project/tree/master/Mail%20Prediction",
+        "category": "ml",
+    },
+
+    // ------------------- Web -------------------
+    {
+        "title": "Portfolio (GitHub Pages)",
+        "description": "Static portfolio site (earlier iteration).",
+        "tech": ["HTML", "CSS"],
+        "url": "https://github.com/Nirob-0812/mhnirob.github.io",
+        "category": "web",
+    },
+
+    // ------------------- Apps (Flutter) -------------------
+    {
+        "title": "Booking App (Flutter)",
+        "description": "Demo booking flows & state management.",
+        "tech": ["Dart", "Flutter"],
+        "url": "https://github.com/Nirob-0812/booking_app",
+        "category": "app",
+    },
+    {
+        "title": "CRUD with Firestore + GetX",
+        "description": "Flutter CRUD app using Firestore & GetX.",
+        "tech": ["Dart", "Flutter", "Firestore", "GetX"],
+        "url": "https://github.com/Nirob-0812/Crud_With_Firestore_and_Getx",
+        "category": "app",
+    },
+    {
+        "title": "Todo App (Flutter)",
+        "description": "Task manager with clean widgets and layout.",
+        "tech": ["Dart", "Flutter"],
+        "url": "https://github.com/Nirob-0812/Todo-App-Flutter",
+        "category": "app",
+    },
+    {
+        "title": "Calculator (Flutter)",
+        "description": "Polished calculator UI & interaction.",
+        "tech": ["Dart", "Flutter"],
+        "url": "https://github.com/Nirob-0812/Calculator-Flutter-",
+        "category": "app",
+    },
+    {
+        "title": "UI from Figma (Flutter)",
+        "description": "Pixel-perfect mobile UI recreated from Figma design.",
+        "tech": ["Dart", "Flutter", "Figma"],
+        "url": "https://github.com/Nirob-0812/UI_Design_from_Figma-Flutter-",
+        "category": "app",
+    },
+
+    // --------------- Programming / Algorithms ---------------
+    {
+        "title": "CP Using Python",
+        "description": "Competitive-programming solutions in clean, testable Python.",
+        "tech": ["Python", "Algorithms", "DSA"],
+        "url": "https://github.com/Nirob-0812/CP_Using_Python",
+        "category": "algo",
+    },
+    {
+        "title": "CP Using C++",
+        "description": "Competitive-programming solutions in clean, testable Python.",
+        "tech": ["C++", "Algorithms", "DSA"],
+        "url": "https://github.com/Nirob-0812/Codeforces-cpp-Code",
+        "category": "algo",
+    },
+
+    {
+        "title": "All Varsity Tasks (C++)",
+        "description": "C++ coursework and data-structures practice.",
+        "tech": ["C++"],
+        "url": "https://github.com/Nirob-0812/AllTaskOfVarsity",
+        "category": "algo",
+    },
+    {
+        "title": "acade.studio",
+        "description": "C++ sandbox for algorithms and performance practice.",
+        "tech": ["C++"],
+        "url": "https://github.com/Nirob-0812/acade.studio",
+        "category": "algo",
+    },
+
+    // ---------------- Robotics / ROS ----------------
+    {
+        "title": "ROS2 Workspace",
+        "description": "C++ ROS2 workspace for robotics nodes and experiments.",
+        "tech": ["C++", "ROS2"],
+        "url": "https://github.com/Nirob-0812/ros2_ws",
+        "category": "robotics",
+    },
+
+    // ---------------- Notebooks / Study ----------------
+    {
+        "title": "Colab Notebooks",
+        "description": "Reusable Colab notebooks for ML/DL prototyping.",
+        "tech": ["Python", "Colab", "Jupyter"],
+        "url": "https://github.com/Nirob-0812/Colab_Notebooks",
+        "category": "notebook",
+    },
+]
+
+
 /* =========================================================
    Small helpers / config
    ========================================================= */
@@ -5,7 +223,7 @@ const D = document;
 const $id = (sel) => D.getElementById(sel);
 const esc = (s) =>
   (s ?? "").toString().replace(/[&<>"']/g, (m) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&//39;" }[m])
   );
 
 const bodyData = D.body?.dataset || {};
@@ -146,7 +364,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
    ========================================================= */
 function skeletonCard() {
   return `
-    <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
+    <a class="project-card skeleton-card" href="//" aria-hidden="true" tabindex="-1">
       <div class="skeleton skeleton-line w-60"></div>
       <div class="skeleton skeleton-line w-90"></div>
       <div class="tags">
@@ -316,94 +534,32 @@ let projectSkeletonResizeHandler = null;
 async function renderProjects() {
   const mount = $id("projectsApp");
   if (!mount) return;
-  if (!API_BASE) return;
 
-  const drawSkeleton = () => renderSkeletonGridInto(mount, skeletonCountForViewport());
-  drawSkeleton();
-  projectSkeletonResizeHandler = () => drawSkeleton();
-  window.addEventListener("resize", projectSkeletonResizeHandler, { passive: true });
+  // The API call is removed. We use our local PROJECTS array directly.
+  const items = PROJECTS;
 
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: "omit" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const items = await res.json();
-
-    window.removeEventListener("resize", projectSkeletonResizeHandler);
-    projectSkeletonResizeHandler = null;
-
-    if (!Array.isArray(items) || !items.length) {
-      mount.innerHTML = "<div class=\"info\">No projects yet.</div>";
-      return;
-    }
-
-    const grouped = {};
-    for (const p of items) (grouped[p.category || "other"] ||= []).push(p);
-
-    let html = "";
-    for (const key of CATEGORY_ORDER) {
-      const list = grouped[key];
-      if (!list || !list.length) continue;
-
-      html += `<section class="project-section">
-        <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
-        <div class="project-grid">`;
-
-      for (const p of list) {
-        const techs = getTechs(p);
-        const href = p.url || p.href || "#";
-        const desc = p.summary || p.desc || p.description || "";
-        html += `
-          <a class="project-card" ${
-            href && href !== "#"
-              ? `href="${esc(href)}" target="_blank" rel="noopener"`
-              : 'href="#"'
-          }>
-            <h3>${esc(p.title)}</h3>
-            <p>${esc(desc)}</p>
-            <div class="tags">
-              ${(Array.isArray(techs) ? techs : [])
-                .map((t) => `<span class="tag">${esc(t)}</span>`)
-                .join("")}
-            </div>
-          </a>`;
-      }
-
-      html += `</div></section>`;
-    }
-
-    mount.innerHTML = html || '<div class="info">No projects available.</div>';
-  } catch (err) {
-    console.error(err);
-    window.removeEventListener("resize", projectSkeletonResizeHandler);
-    projectSkeletonResizeHandler = null;
-    mount.innerHTML = '<div class="info">Failed to load projects.</div>';
+  if (!Array.isArray(items) || !items.length) {
+    mount.innerHTML = '<div class="info">No projects yet.</div>';
+    return;
   }
-}
 
-/* =========================================================
-   Home — Featured (first 6) + skeleton
-   ========================================================= */
-async function renderFeatured() {
-  const grid = $id("featuredGrid");
-  if (!grid) return;
-  if (!API_BASE) return;
+  const grouped = {};
+  for (const p of items) (grouped[p.category || "other"] ||= []).push(p);
 
-  grid.innerHTML = Array.from({ length: 6 }).map(skeletonCard).join("");
+  let html = "";
+  for (const key of CATEGORY_ORDER) {
+    const list = grouped[key];
+    if (!list || !list.length) continue;
 
-  try {
-    const res = await fetch(`${API_BASE}/api/projects/`, { credentials: "omit" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const items = await res.json();
+    html += `<section class="project-section">
+      <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
+      <div class="project-grid">`;
 
-    const featured = Array.isArray(items) ? items.slice(0, 6) : [];
-    if (!featured.length) return;
-
-    grid.innerHTML = featured
-      .map((p) => {
-        const href = p.url || p.href || "#";
-        const desc = p.summary || p.desc || p.description || "";
-        const techs = getTechs(p);
-        return `
+    for (const p of list) {
+      const techs = getTechs(p);
+      const href = p.url || p.href || "#";
+      const desc = p.summary || p.desc || p.description || "";
+      html += `
         <a class="project-card" ${
           href && href !== "#"
             ? `href="${esc(href)}" target="_blank" rel="noopener"`
@@ -417,12 +573,52 @@ async function renderFeatured() {
               .join("")}
           </div>
         </a>`;
-      })
-      .join("");
-  } catch (err) {
-    console.error(err);
-    grid.innerHTML = '<div class="info">Failed to load featured projects.</div>';
+    }
+
+    html += `</div></section>`;
   }
+
+  mount.innerHTML = html || '<div class="info">No projects available.</div>';
+}
+
+/* =========================================================
+   Home — Featured (first 6) + skeleton
+   ========================================================= */
+// static/js/main.js
+
+async function renderFeatured() {
+  const grid = $id("featuredGrid");
+  if (!grid) return;
+
+  // The API call is removed. We use our local PROJECTS array directly.
+  const featured = Array.isArray(PROJECTS) ? PROJECTS.slice(0, 6) : [];
+  if (!featured.length) {
+      // Optional: keep skeleton or show a message if no projects
+      grid.innerHTML = '<div class="info">No featured projects yet.</div>';
+      return;
+  }
+
+  grid.innerHTML = featured
+    .map((p) => {
+      const href = p.url || p.href || "#";
+      const desc = p.summary || p.desc || p.description || "";
+      const techs = getTechs(p);
+      return `
+      <a class="project-card" ${
+        href && href !== "#"
+          ? `href="${esc(href)}" target="_blank" rel="noopener"`
+          : 'href="#"'
+      }>
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(desc)}</p>
+        <div class="tags">
+          ${(Array.isArray(techs) ? techs : [])
+            .map((t) => `<span class="tag">${esc(t)}</span>`)
+            .join("")}
+        </div>
+      </a>`;
+    })
+    .join("");
 }
 
 /* =========================================================
@@ -453,24 +649,11 @@ function setupContactForm() {
     };
 
     try {
-    // The new URL goes directly into the fetch command
-        const res = await fetch('https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api', {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type": "application/json",
-
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcHRlem95cXJ2am94dHdya2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMzgzNTIsImV4cCI6MjA3MzYxNDM1Mn0.TOtb1VFYknfnwYqCPnOuP6dswNfV6MFgt45JIgJt3iQ",       // <-- Add this line
-
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcHRlem95cXJ2am94dHdya2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMzgzNTIsImV4cCI6MjA3MzYxNDM1Mn0.TOtb1VFYknfnwYqCPnOuP6dswNfV6MFgt45JIgJt3iQ" // <-- And this line
-
-          },
-
-          body: JSON.stringify(payload),
-
-        });
+      const res = await fetch(`${API_BASE}/api/contact/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       if (!res.ok) throw new Error("HTTP " + res.status);
       form.reset();
       okEl && (okEl.hidden = false);

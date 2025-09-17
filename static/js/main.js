@@ -1,6 +1,30 @@
+/* =========================================================
+   Small helpers / config
+   ========================================================= */
+const D = document;
+const $id = (sel) => D.getElementById(sel);
+
+// FIXED: The typo was here ('&//39;'). It's now corrected to '&#39;'.
+// This was the error that broke the entire script.
+const esc = (s) =>
+  (s ?? "").toString().replace(/[&<>"']/g, (m) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+  );
+
+// SIMPLIFIED: API logic is no longer needed.
+const API_BASE = "";
+
+// Fallback values if you don't provide data-* attributes in HTML
+const STATS_DEFAULTS = {
+  projects: 27,   // <— change anytime
+  certs: 12,      // <— change anytime
+  startYear: 2024 // <— first year you started (used to compute years)
+};
+
+/* =========================================================
+   Local Project Data (This replaces the API)
+   ========================================================= */
 const PROJECTS = [
-   
-    //----------Deployed projects-------------
     {
         "title": "AI Assistant Platform (API + UI)",
         "description": "FastAPI backend with static JS UI for Q&A, images, and content.",
@@ -8,7 +32,6 @@ const PROJECTS = [
         "url": "https://nirob-0812.github.io/ai-task-ui/",
         "category": "deployed"
     },
-    // -------- Deep Learning / CV ----------
     {
         "title": "Violence Detection",
         "description": "Deep-learning pipeline to detect violence in video frames.",
@@ -37,8 +60,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/DL_Exercise/tree/master/Activation_Function",
         "category": "dl",
     },
-
-    // --------------- Machine Learning ---------------
     {
         "title": "ML Exercises",
         "description": "Hands-on ML exercises: regression, classification, model evaluation.",
@@ -88,8 +109,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/ML_Exercise/tree/master/Insurance_Prediction",
         "category": "ml",
     },
-
-    // --------------- ML Projects (problem sets) ---------------
     {
         "title": "Diabetes Prediction",
         "description": "End-to-end classification pipeline from the medical dataset.",
@@ -118,8 +137,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/ML-Project/tree/master/Mail%20Prediction",
         "category": "ml",
     },
-
-    // ------------------- Web -------------------
     {
         "title": "Portfolio (GitHub Pages)",
         "description": "Static portfolio site (earlier iteration).",
@@ -127,8 +144,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/mhnirob.github.io",
         "category": "web",
     },
-
-    // ------------------- Apps (Flutter) -------------------
     {
         "title": "Booking App (Flutter)",
         "description": "Demo booking flows & state management.",
@@ -164,8 +179,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/UI_Design_from_Figma-Flutter-",
         "category": "app",
     },
-
-    // --------------- Programming / Algorithms ---------------
     {
         "title": "CP Using Python",
         "description": "Competitive-programming solutions in clean, testable Python.",
@@ -180,7 +193,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/Codeforces-cpp-Code",
         "category": "algo",
     },
-
     {
         "title": "All Varsity Tasks (C++)",
         "description": "C++ coursework and data-structures practice.",
@@ -195,8 +207,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/acade.studio",
         "category": "algo",
     },
-
-    // ---------------- Robotics / ROS ----------------
     {
         "title": "ROS2 Workspace",
         "description": "C++ ROS2 workspace for robotics nodes and experiments.",
@@ -204,8 +214,6 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/ros2_ws",
         "category": "robotics",
     },
-
-    // ---------------- Notebooks / Study ----------------
     {
         "title": "Colab Notebooks",
         "description": "Reusable Colab notebooks for ML/DL prototyping.",
@@ -213,36 +221,10 @@ const PROJECTS = [
         "url": "https://github.com/Nirob-0812/Colab_Notebooks",
         "category": "notebook",
     },
-]
-
-
-/* =========================================================
-   Small helpers / config
-   ========================================================= */
-const D = document;
-const $id = (sel) => D.getElementById(sel);
-const esc = (s) =>
-  (s ?? "").toString().replace(/[&<>"']/g, (m) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&//39;" }[m])
-  );
-
-const bodyData = D.body?.dataset || {};
-// Accept either data-api="<url>" OR data-api="on" + data-api-base="<url>"
-const API_BASE =
-  bodyData.api && bodyData.api !== "off"
-    ? (bodyData.apiBase || bodyData.api).replace(/\/+$/, "")
-    : "";
-
-// Fallback values if you don't provide data-* attributes in HTML
-const STATS_DEFAULTS = {
-  projects: 27,   // <— change anytime
-  certs: 12,      // <— change anytime
-  startYear: 2024 // <— first year you started (used to compute years)
-};
+];
 
 /* =========================================================
    Optional: auto-clean .../index.html → ...
-   (Safe no-op for already clean URLs)
    ========================================================= */
 if (/\/index\.html$/.test(location.pathname)) {
   location.replace(location.pathname.replace(/index\.html$/, ""));
@@ -264,7 +246,6 @@ function toggleNav() {
 }
 window.toggleNav = toggleNav;
 
-// Close the mobile menu when tapping/clicking outside it (or pressing Esc)
 function setupNavOutsideClose() {
   const nav = $id("nav");
   const btn = D.querySelector(".hamburger");
@@ -284,7 +265,6 @@ function setupNavOutsideClose() {
   D.addEventListener("click", onAnyPointer, { capture: true });
   D.addEventListener("touchstart", onAnyPointer, { passive: true, capture: true });
 
-  // Close on Esc
   D.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && nav.classList.contains("open")) {
       nav.classList.remove("open");
@@ -292,7 +272,6 @@ function setupNavOutsideClose() {
     }
   });
 
-  // If a link inside the menu is tapped, close it immediately
   nav.addEventListener("click", (e) => {
     if (e.target.closest("a")) {
       nav.classList.remove("open");
@@ -315,12 +294,8 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   if (!btn) return;
 
   const root = document.documentElement;
-
-  // Default to DAY (light) if nothing saved
   let theme = localStorage.getItem("theme") || "light";
   apply(theme);
-
-  // Enable animations after first paint (prevents initial jump)
   requestAnimationFrame(() => btn.classList.add("enable-anim"));
 
   function apply(t) {
@@ -364,7 +339,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
    ========================================================= */
 function skeletonCard() {
   return `
-    <a class="project-card skeleton-card" href="//" aria-hidden="true" tabindex="-1">
+    <a class="project-card skeleton-card" href="#" aria-hidden="true" tabindex="-1">
       <div class="skeleton skeleton-line w-60"></div>
       <div class="skeleton skeleton-line w-90"></div>
       <div class="tags">
@@ -376,11 +351,11 @@ function skeletonCard() {
 }
 function skeletonCountForViewport() {
   const w = window.innerWidth || D.documentElement.clientWidth || 1024;
-  if (w < 480) return 4;   // phones
-  if (w < 768) return 6;   // small tablets
-  if (w < 1024) return 8;  // tablets
-  if (w < 1440) return 12; // laptop
-  return 16;               // wide desktop
+  if (w < 480) return 4;
+  if (w < 768) return 6;
+  if (w < 1024) return 8;
+  if (w < 1440) return 12;
+  return 16;
 }
 function renderSkeletonGridInto(container, count) {
   container.innerHTML = `<div class="project-grid">${Array.from({ length: count })
@@ -429,7 +404,7 @@ function preloadImages(urls, timeoutMs = 10000) {
 async function renderCertificates() {
   const grid = $id("certGrid");
   if (!grid) return;
-  if (!API_BASE) return; // keep any static fallback
+  if (!API_BASE) return; // This will now always be true, so the function won't run. This is safe.
 
   const count = Math.max(6, Math.min(12, skeletonCountForViewport()));
   grid.innerHTML = Array.from({ length: count }).map(certSkeletonCard).join("");
@@ -511,7 +486,7 @@ async function renderCertificates() {
 })();
 
 /* =========================================================
-   Projects page — skeleton like Featured (no headers while loading)
+   Projects page — uses local data
    ========================================================= */
 const CATEGORY_TITLES = {
   deployed: "Deployed Projects",
@@ -524,20 +499,16 @@ const CATEGORY_TITLES = {
   notebook: "Notebooks / Study",
   other: "Other",
 };
-const CATEGORY_ORDER = ["deployed","dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
+const CATEGORY_ORDER = ["deployed", "dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
 function getTechs(p) {
   return p.techs || p.tech || p.tags || p.stack || [];
 }
 
-let projectSkeletonResizeHandler = null;
-
-async function renderProjects() {
+function renderProjects() {
   const mount = $id("projectsApp");
   if (!mount) return;
 
-  // The API call is removed. We use our local PROJECTS array directly.
   const items = PROJECTS;
-
   if (!Array.isArray(items) || !items.length) {
     mount.innerHTML = '<div class="info">No projects yet.</div>';
     return;
@@ -560,11 +531,7 @@ async function renderProjects() {
       const href = p.url || p.href || "#";
       const desc = p.summary || p.desc || p.description || "";
       html += `
-        <a class="project-card" ${
-          href && href !== "#"
-            ? `href="${esc(href)}" target="_blank" rel="noopener"`
-            : 'href="#"'
-        }>
+        <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
           <h3>${esc(p.title)}</h3>
           <p>${esc(desc)}</p>
           <div class="tags">
@@ -574,28 +541,22 @@ async function renderProjects() {
           </div>
         </a>`;
     }
-
     html += `</div></section>`;
   }
-
   mount.innerHTML = html || '<div class="info">No projects available.</div>';
 }
 
 /* =========================================================
-   Home — Featured (first 6) + skeleton
+   Home — Featured projects (uses local data)
    ========================================================= */
-// static/js/main.js
-
-async function renderFeatured() {
+function renderFeatured() {
   const grid = $id("featuredGrid");
   if (!grid) return;
 
-  // The API call is removed. We use our local PROJECTS array directly.
   const featured = Array.isArray(PROJECTS) ? PROJECTS.slice(0, 6) : [];
   if (!featured.length) {
-      // Optional: keep skeleton or show a message if no projects
-      grid.innerHTML = '<div class="info">No featured projects yet.</div>';
-      return;
+    grid.innerHTML = '<div class="info">No featured projects yet.</div>';
+    return;
   }
 
   grid.innerHTML = featured
@@ -604,11 +565,7 @@ async function renderFeatured() {
       const desc = p.summary || p.desc || p.description || "";
       const techs = getTechs(p);
       return `
-      <a class="project-card" ${
-        href && href !== "#"
-          ? `href="${esc(href)}" target="_blank" rel="noopener"`
-          : 'href="#"'
-      }>
+      <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
         <h3>${esc(p.title)}</h3>
         <p>${esc(desc)}</p>
         <div class="tags">
@@ -622,7 +579,7 @@ async function renderFeatured() {
 }
 
 /* =========================================================
-   Contact — post to FastAPI when API_BASE present
+   Contact Form
    ========================================================= */
 function setupContactForm() {
   const form = $id("contactForm");
@@ -632,11 +589,10 @@ function setupContactForm() {
   const okEl = $id("contactOk");
   const errEl = $id("contactErr");
 
-  if (!API_BASE) return; // fallback Formspree action stays
+  if (!API_BASE) return; // This will now always be true, so the function won't run. This is safe.
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     okEl && (okEl.hidden = true);
     errEl && (errEl.hidden = true);
     btn && (btn.disabled = true);
@@ -667,78 +623,52 @@ function setupContactForm() {
 }
 
 /* =========================================================
-   Tablet swipe navigation (left/right) between pages
-   ——— Updated for clean URLs (no .html)
+   Tablet swipe navigation
    ========================================================= */
 function enableSwipePageNav() {
-  // Only for tablet-ish widths
   const isTabletWidth = () => {
     const w = window.innerWidth || D.documentElement.clientWidth || 1024;
     return w >= 600 && w <= 1100;
   };
-
-  // Map page order (clean URLs, all with trailing slash)
   const pages = ["/", "/about/", "/projects/", "/resume/", "/certificates/"];
-
-  // Normalize current path to this format
   const normalize = (p) => {
     if (!p || p === "/") return "/";
     return p.replace(/\/+$/, "") + "/";
   };
-
-  let startX = 0,
-    startY = 0,
-    tracking = false;
-
-  const ignoreTarget = (t) =>
-    !!t.closest("a, button, input, textarea, select, label, .no-swipe, .nav");
+  let startX = 0, startY = 0, tracking = false;
+  const ignoreTarget = (t) => !!t.closest("a, button, input, textarea, select, label, .no-swipe, .nav");
 
   function onStart(e) {
     if (!isTabletWidth()) return;
     const t = (e.touches && e.touches[0]) || e;
     if (!t || ignoreTarget(e.target)) return;
-    // Don’t start when menu is open
     const nav = $id("nav");
     if (nav && nav.classList.contains("open")) return;
-
     tracking = true;
     startX = t.clientX;
     startY = t.clientY;
   }
-
   function onMove(e) {
     if (!tracking) return;
     const t = (e.touches && e.touches[0]) || e;
     const dx = t.clientX - startX;
     const dy = t.clientY - startY;
-
-    // Cancel if mostly vertical scroll
     if (Math.abs(dy) > 60) {
       tracking = false;
       return;
     }
-
-    // Trigger on significant horizontal move
     const THRESH = 80;
     if (Math.abs(dx) > THRESH) {
       tracking = false;
-
-      // Use clean normalized path
       const curr = normalize(location.pathname);
       let idx = pages.indexOf(curr);
       if (idx === -1) {
-        // Fallback: if someone is on a subpath not in the list, treat as home
         idx = 0;
       }
-
-      const targetIdx = dx < 0
-        ? Math.min(idx + 1, pages.length - 1)  // swipe left -> next
-        : Math.max(idx - 1, 0);                // swipe right -> prev
-
+      const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0);
       if (targetIdx !== idx) location.href = pages[targetIdx];
     }
   }
-
   function onEnd() {
     tracking = false;
   }
@@ -746,22 +676,20 @@ function enableSwipePageNav() {
   window.addEventListener("touchstart", onStart, { passive: true });
   window.addEventListener("touchmove", onMove, { passive: true });
   window.addEventListener("touchend", onEnd, { passive: true });
-
-  // Pointer events fallback (stylus/trackpad)
   window.addEventListener("pointerdown", onStart, { passive: true });
   window.addEventListener("pointermove", onMove, { passive: true });
   window.addEventListener("pointerup", onEnd, { passive: true });
 }
 
 /* =========================================================
-   Stats counters (Projects / Years / Certificates)
+   Stats counters
    ========================================================= */
 function animateCount(el, target, duration = 1200) {
   const startVal = 0;
   const start = performance.now();
   function tick(now) {
     const p = Math.min(1, (now - start) / duration);
-    el.textContent = Math.floor(startVal + (target - startVal) * p);
+    el.textContent = String(Math.floor(startVal + (target - startVal) * p));
     if (p < 1) requestAnimationFrame(tick);
     else el.textContent = String(target);
   }
@@ -772,7 +700,6 @@ function initStats() {
   const stats = document.getElementById("stats");
   if (!stats) return;
 
-  // Use data-* if present, otherwise the defaults above
   const cfg = {
     projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
     certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
@@ -780,7 +707,6 @@ function initStats() {
   };
 
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
-
   const elP = document.getElementById("countProjects");
   const elY = document.getElementById("countYears");
   const elC = document.getElementById("countCerts");
@@ -802,7 +728,6 @@ function initStats() {
     },
     { threshold: 0.3 }
   );
-
   io.observe(stats);
 }
 

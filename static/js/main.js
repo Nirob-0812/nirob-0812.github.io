@@ -454,11 +454,23 @@ function setupContactForm() {
 
     try {
     // The new URL goes directly into the fetch command
-    const res = await fetch('https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+        const res = await fetch('https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api', {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type": "application/json",
+
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcHRlem95cXJ2am94dHdya2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMzgzNTIsImV4cCI6MjA3MzYxNDM1Mn0.TOtb1VFYknfnwYqCPnOuP6dswNfV6MFgt45JIgJt3iQ",       // <-- Add this line
+
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcHRlem95cXJ2am94dHdya2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMzgzNTIsImV4cCI6MjA3MzYxNDM1Mn0.TOtb1VFYknfnwYqCPnOuP6dswNfV6MFgt45JIgJt3iQ" // <-- And this line
+
+          },
+
+          body: JSON.stringify(payload),
+
+        });
       if (!res.ok) throw new Error("HTTP " + res.status);
       form.reset();
       okEl && (okEl.hidden = false);

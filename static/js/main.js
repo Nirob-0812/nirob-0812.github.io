@@ -109,20 +109,46 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   });
 })();
 
+
+/* =========================================================
+   UPDATED: Certificates function
+   ========================================================= */
 function renderCertificates() {
   const grid = $id("certGrid");
-  if (!grid) return;
-  if (typeof CERTIFICATES === 'undefined' || !CERTIFICATES.length) return;
-  const html = CERTIFICATES.map(c => `
+  if (!grid) return; // Exit if not on the certificates page
+
+  if (typeof CERTIFICATES === 'undefined' || !CERTIFICATES.length) {
+    return;
+  }
+
+  const html = CERTIFICATES
+    .map(
+      (c) => `
     <article class="cert-card">
-      <div class="cert-thumb"><a href="${esc(c.verify_url)}" target="_blank" rel="noopener"><img src="${esc(c.image)}" alt="${esc(c.title)}"></a></div>
-      <div class="cert-body"><h3>${esc(c.title)}</h3><div class="cert-meta">${esc(c.issuer||"")}${c.date?" · "+esc(c.date):""}</div>
-        <div class="cert-actions">${c.verify_url?`<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>`:""}<button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button></div>
+      <div class="cert-thumb">
+        <img src="${esc(c.image)}" alt="${esc(c.title)}">
       </div>
-    </article>`).join("");
+      <div class="cert-body">
+        <h3>${esc(c.title)}</h3>
+        <div class="cert-meta">
+          ${esc(c.issuer || "")}${c.date ? " · " + esc(c.date) : ""}
+        </div>
+        <div class="cert-actions">
+          ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ""}
+          <button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button>
+        </div>
+      </div>
+    </article>
+  `
+    )
+    .join("");
+
   grid.innerHTML = html;
 }
 
+/* =========================================================
+   Certificate Modal
+   ========================================================= */
 (function setupCertModal() {
   const modal = $id("certModal");
   const imgEl = $id("certImg");

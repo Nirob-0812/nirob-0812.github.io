@@ -14,7 +14,8 @@ const STATS_DEFAULTS = {
   startYear: 2024
 };
 
-// NOTE: PROJECTS and CERTIFICATES data arrays have been completely REMOVED from this file.
+// NOTE: PROJECTS and CERTIFICATES data arrays have been REMOVED from this file.
+// They now live in their respective HTML pages.
 
 /* =========================================================
    Optional: auto-clean .../index.html → ...
@@ -110,50 +111,22 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   });
 })();
 
-
-/* =========================================================
-   UPDATED: Certificates function (Safe Version)
-   ========================================================= */
 function renderCertificates() {
   const grid = $id("certGrid");
-  if (!grid) return; // Exit if not on the certificates page
-
-  // Safely check if the CERTIFICATES variable was defined on the current page
+  if (!grid) return;
   if (typeof CERTIFICATES === 'undefined' || !CERTIFICATES.length) {
-    // grid.innerHTML = '<div class="info">No certificate data found on this page.</div>';
     return;
   }
-
-  const html = CERTIFICATES
-    .map(
-      (c) => `
+  const html = CERTIFICATES.map(c => `
     <article class="cert-card">
-      <div class="cert-thumb">
-        <a href="${esc(c.verify_url)}" target="_blank" rel="noopener">
-          <img src="${esc(c.image)}" alt="${esc(c.title)}">
-        </a>
+      <div class="cert-thumb"><a href="${esc(c.verify_url)}" target="_blank" rel="noopener"><img src="${esc(c.image)}" alt="${esc(c.title)}"></a></div>
+      <div class="cert-body"><h3>${esc(c.title)}</h3><div class="cert-meta">${esc(c.issuer||"")}${c.date?" · "+esc(c.date):""}</div>
+        <div class="cert-actions">${c.verify_url?`<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>`:""}<button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button></div>
       </div>
-      <div class="cert-body">
-        <h3>${esc(c.title)}</h3>
-        <div class="cert-meta">
-          ${esc(c.issuer || "")}${c.date ? " · " + esc(c.date) : ""}
-        </div>
-        <div class="cert-actions">
-          ${c.verify_url ? `<a class="btn verify" href="${esc(c.verify_url)}" target="_blank" rel="noopener">Verify</a>` : ""}
-          <button class="btn ghost view" data-cert-view="${esc(c.image)}">View</button>
-        </div>
-      </div>
-    </article>
-  `
-    )
-    .join("");
-
+    </article>`).join("");
   grid.innerHTML = html;
 }
 
-/* =========================================================
-   Certificate Modal
-   ========================================================= */
 (function setupCertModal() {
   const modal = $id("certModal");
   const imgEl = $id("certImg");
@@ -187,156 +160,112 @@ function renderCertificates() {
   });
 })();
 
-/* =========================================================
-   UPDATED: Projects page function (Safe Version)
-   ========================================================= */
-const CATEGORY_TITLES = {
-  deployed: "Deployed Projects",
-  dl: "Deep Learning / CV",
-  ml: "Machine Learning",
-  web: "Web",
-  app: "Apps (Flutter)",
-  algo: "Programming & Algorithms",
-  robotics: "Robotics",
-  notebook: "Notebooks / Study",
-  other: "Other",
-};
+const CATEGORY_TITLES = { deployed: "Deployed Projects", dl: "Deep Learning / CV", ml: "Machine Learning", web: "Web", app: "Apps (Flutter)", algo: "Programming & Algorithms", robotics: "Robotics", notebook: "Notebooks / Study", other: "Other" };
 const CATEGORY_ORDER = ["deployed", "dl", "ml", "web", "app", "algo", "robotics", "notebook", "other"];
-function getTechs(p) {
-  return p.techs || p.tech || p.tags || p.stack || [];
-}
+function getTechs(p) { return p.techs || p.tech || p.tags || p.stack || []; }
 
 function renderProjects() {
   const mount = $id("projectsApp");
-  if (!mount) return; // Exit if not on the projects page
-
-  // Safely check if the PROJECTS variable was defined on the current page
+  if (!mount) return;
   if (typeof PROJECTS === 'undefined' || !PROJECTS.length) {
-    // mount.innerHTML = '<div class="info">No project data found on this page.</div>';
     return;
   }
-
   const items = PROJECTS;
   const grouped = {};
-  for (const p of items) (grouped[p.category || "other"] ||= []).push(p);
-
+  for (const p of items)(grouped[p.category || "other"] ||= []).push(p);
   let html = "";
   for (const key of CATEGORY_ORDER) {
     const list = grouped[key];
     if (!list || !list.length) continue;
-    html += `<section class="project-section">
-      <h2 class="section-title">${esc(CATEGORY_TITLES[key] || key)}</h2>
-      <div class="project-grid">`;
+    html += `<section class="project-section"><h2 class="section-title">${esc(CATEGORY_TITLES[key]||key)}</h2><div class="project-grid">`;
     for (const p of list) {
       const techs = getTechs(p);
       const href = p.url || p.href || "#";
       const desc = p.summary || p.desc || p.description || "";
-      html += `
-        <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(desc)}</p>
-          <div class="tags">
-            ${(Array.isArray(techs) ? techs : [])
-              .map((t) => `<span class="tag">${esc(t)}</span>`)
-              .join("")}
-          </div>
-        </a>`;
+      html += `<a class="project-card" href="${esc(href)}" target="_blank" rel="noopener"><h3>${esc(p.title)}</h3><p>${esc(desc)}</p><div class="tags">${(Array.isArray(techs)?techs:[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div></a>`;
     }
     html += `</div></section>`;
   }
   mount.innerHTML = html || '<div class="info">No projects available.</div>';
 }
 
-/* =========================================================
-   UPDATED: Home — Featured projects function (Safe Version)
-   ========================================================= */
 function renderFeatured() {
   const grid = $id("featuredGrid");
-  if (!grid) return; // Exit if not on the home page
-
-  // Safely check if the PROJECTS variable was defined on the current page
+  if (!grid) return;
   if (typeof PROJECTS === 'undefined' || !PROJECTS.length) {
-    // grid.innerHTML = '<div class="info">No featured project data found on this page.</div>';
     return;
   }
-
   const featured = PROJECTS.slice(0, 6);
-  grid.innerHTML = featured
-    .map((p) => {
-      const href = p.url || p.href || "#";
-      const desc = p.summary || p.desc || p.description || "";
-      const techs = getTechs(p);
-      return `
-      <a class="project-card" href="${esc(href)}" target="_blank" rel="noopener">
-        <h3>${esc(p.title)}</h3>
-        <p>${esc(desc)}</p>
-        <div class="tags">
-          ${(Array.isArray(techs) ? techs : [])
-            .map((t) => `<span class="tag">${esc(t)}</span>`)
-            .join("")}
-        </div>
-      </a>`;
-    })
-    .join("");
+  grid.innerHTML = featured.map(p => {
+    const href = p.url || p.href || "#";
+    const desc = p.summary || p.desc || p.description || "";
+    const techs = getTechs(p);
+    return `<a class="project-card" href="${esc(href)}" target="_blank" rel="noopener"><h3>${esc(p.title)}</h3><p>${esc(desc)}</p><div class="tags">${(Array.isArray(techs)?techs:[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div></a>`;
+  }).join("");
 }
 
 /* =========================================================
-   The Rest of Your Functions (Untouched)
+   UPDATED: Contact Form now submits with JavaScript
    ========================================================= */
 function setupContactForm() {
-  const form = $id("contactForm");
-  if (!form) return;
-  if (!API_BASE) return;
+    const form = $id("contactForm");
+    if (!form) return;
+
+    const btn = form.querySelector('button[type="submit"]');
+    const okEl = $id("contactOk");
+    const errEl = $id("contactErr");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // This stops the browser from redirecting
+
+        // Show loading state
+        okEl && (okEl.hidden = true);
+        errEl && (errEl.hidden = true);
+        btn && (btn.disabled = true);
+
+        const formData = new FormData(form);
+
+        try {
+            // IMPORTANT: Get your endpoint URL from formspree.io
+            const formspreeURL = 'https://formspree.io/f/your_unique_id'; // <--- PASTE YOUR URL HERE
+
+            const response = await fetch(formspreeURL, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json' // This header is required for AJAX requests
+                }
+            });
+
+            if (response.ok) {
+                // Success!
+                form.reset();
+                okEl && (okEl.hidden = false);
+            } else {
+                // Error
+                errEl && (errEl.hidden = false);
+            }
+        } catch (error) {
+            // Network error
+            console.error('Form submission error:', error);
+            errEl && (errEl.hidden = false);
+        } finally {
+            // Re-enable the button
+            btn && (btn.disabled = false);
+        }
+    });
 }
 
+
 function enableSwipePageNav() {
-  const isTabletWidth = () => {
-    const w = window.innerWidth || D.documentElement.clientWidth || 1024;
-    return w >= 600 && w <= 1100;
-  };
+  const isTabletWidth = () => { const w = window.innerWidth || D.documentElement.clientWidth || 1024; return w >= 600 && w <= 1100; };
   const pages = ["/", "/about/", "/projects/", "/resume/", "/certificates/"];
-  const normalize = (p) => {
-    if (!p || p === "/") return "/";
-    return p.replace(/\/+$/, "") + "/";
-  };
+  const normalize = (p) => { if (!p || p === "/") return "/"; return p.replace(/\/+$/, "") + "/"; };
   let startX = 0, startY = 0, tracking = false;
   const ignoreTarget = (t) => !!t.closest("a, button, input, textarea, select, label, .no-swipe, .nav");
-
-  function onStart(e) {
-    if (!isTabletWidth()) return;
-    const t = (e.touches && e.touches[0]) || e;
-    if (!t || ignoreTarget(e.target)) return;
-    const nav = $id("nav");
-    if (nav && nav.classList.contains("open")) return;
-    tracking = true;
-    startX = t.clientX;
-    startY = t.clientY;
-  }
-  function onMove(e) {
-    if (!tracking) return;
-    const t = (e.touches && e.touches[0]) || e;
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-    if (Math.abs(dy) > 60) {
-      tracking = false;
-      return;
-    }
-    const THRESH = 80;
-    if (Math.abs(dx) > THRESH) {
-      tracking = false;
-      const curr = normalize(location.pathname);
-      let idx = pages.indexOf(curr);
-      if (idx === -1) {
-        idx = 0;
-      }
-      const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0);
-      if (targetIdx !== idx) location.href = pages[targetIdx];
-    }
-  }
-  function onEnd() {
-    tracking = false;
-  }
-
+  function onStart(e) { if (!isTabletWidth()) return; const t = (e.touches && e.touches[0]) || e; if (!t || ignoreTarget(e.target)) return; const nav = $id("nav"); if (nav && nav.classList.contains("open")) return; tracking = true; startX = t.clientX; startY = t.clientY; }
+  function onMove(e) { if (!tracking) return; const t = (e.touches && e.touches[0]) || e; const dx = t.clientX - startX; const dy = t.clientY - startY; if (Math.abs(dy) > 60) { tracking = false; return; } if (Math.abs(dx) > 80) { tracking = false; const curr = normalize(location.pathname); let idx = pages.indexOf(curr); if (idx === -1) idx = 0; const targetIdx = dx < 0 ? Math.min(idx + 1, pages.length - 1) : Math.max(idx - 1, 0); if (targetIdx !== idx) location.href = pages[targetIdx]; } }
+  function onEnd() { tracking = false; }
   window.addEventListener("touchstart", onStart, { passive: true });
   window.addEventListener("touchmove", onMove, { passive: true });
   window.addEventListener("touchend", onEnd, { passive: true });
@@ -360,35 +289,13 @@ function animateCount(el, target, duration = 1200) {
 function initStats() {
   const stats = document.getElementById("stats");
   if (!stats) return;
-
-  const cfg = {
-    projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects),
-    certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs),
-    startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear),
-  };
-
+  const cfg = { projects: Number(stats.dataset.fallbackProjects || STATS_DEFAULTS.projects), certs: Number(stats.dataset.fallbackCerts || STATS_DEFAULTS.certs), startYear: Number(stats.dataset.startYear || STATS_DEFAULTS.startYear), };
   const years = Math.max(1, new Date().getFullYear() - cfg.startYear);
   const elP = document.getElementById("countProjects");
   const elY = document.getElementById("countYears");
   const elC = document.getElementById("countCerts");
-
-  const run = () => {
-    if (elP) animateCount(elP, cfg.projects);
-    if (elY) animateCount(elY, years);
-    if (elC) animateCount(elC, cfg.certs);
-  };
-
-  const io = new IntersectionObserver(
-    (entries, o) => {
-      entries.forEach((en) => {
-        if (en.isIntersecting) {
-          run();
-          o.unobserve(en.target);
-        }
-      });
-    },
-    { threshold: 0.3 }
-  );
+  const run = () => { if (elP) animateCount(elP, cfg.projects); if (elY) animateCount(elY, years); if (elC) animateCount(elC, cfg.certs); };
+  const io = new IntersectionObserver((entries, o) => { entries.forEach((en) => { if (en.isIntersecting) { run(); o.unobserve(en.target); } }); }, { threshold: 0.3 });
   io.observe(stats);
 }
 
@@ -398,11 +305,9 @@ function initStats() {
 document.addEventListener("DOMContentLoaded", () => {
   setupNavOutsideClose();
   enableSwipePageNav();
-
   renderFeatured();
   renderProjects();
   renderCertificates();
   setupContactForm();
-
   initStats();
 });

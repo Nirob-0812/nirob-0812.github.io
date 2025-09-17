@@ -453,11 +453,12 @@ function setupContactForm() {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/api/contact/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    // The new URL goes directly into the fetch command
+    const res = await fetch('https://raptezoyqrvjoxtwrkib.supabase.co/functions/v1/api', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
       if (!res.ok) throw new Error("HTTP " + res.status);
       form.reset();
       okEl && (okEl.hidden = false);
